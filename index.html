@@ -1,113 +1,225 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ETS2 Flare Blink Editor & Preview</title>
-    <link rel="stylesheet" href="assets/style.css">
+    <title>ETS2 Flare Tools - Maintenance Mode</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .maintenance-container {
+            text-align: center;
+            max-width: 600px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 60px 40px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .maintenance-icon {
+            font-size: 120px;
+            margin-bottom: 30px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .maintenance-title {
+            font-size: 2.5em;
+            font-weight: 700;
+            margin-bottom: 20px;
+            background: linear-gradient(45deg, #FFD700, #FFA500);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .maintenance-subtitle {
+            font-size: 1.3em;
+            margin-bottom: 30px;
+            opacity: 0.9;
+            font-weight: 300;
+        }
+
+        .maintenance-message {
+            font-size: 1.1em;
+            line-height: 1.6;
+            margin-bottom: 40px;
+            opacity: 0.8;
+        }
+
+        .maintenance-features {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 30px;
+            margin: 30px 0;
+            text-align: left;
+        }
+
+        .feature-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .feature-list li {
+            padding: 8px 0;
+            font-size: 1em;
+            display: flex;
+            align-items: center;
+        }
+
+        .feature-list li:before {
+            content: "⚡";
+            margin-right: 10px;
+            font-size: 1.2em;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #FFD700, #FFA500);
+            width: 85%;
+            border-radius: 4px;
+            animation: progress 3s ease-in-out infinite;
+        }
+
+        @keyframes progress {
+            0% { width: 75%; }
+            50% { width: 95%; }
+            100% { width: 85%; }
+        }
+
+        .contact-info {
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .contact-link {
+            color: #FFD700;
+            text-decoration: none;
+            font-weight: 600;
+            padding: 10px 20px;
+            border: 2px solid #FFD700;
+            border-radius: 25px;
+            display: inline-block;
+            margin: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .contact-link:hover {
+            background: #FFD700;
+            color: #1e3c72;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(255, 215, 0, 0.3);
+        }
+
+        .eta {
+            font-size: 1.2em;
+            font-weight: 600;
+            color: #FFD700;
+            margin: 20px 0;
+        }
+
+        @media (max-width: 768px) {
+            .maintenance-container {
+                padding: 40px 20px;
+            }
+            
+            .maintenance-title {
+                font-size: 2em;
+            }
+            
+            .maintenance-icon {
+                font-size: 80px;
+            }
+        }
+    </style>
 </head>
-<body data-theme="dark">
-    <div class="container">
-        <div class="header">
-            <div class="header-content">
-                <h1>🚨 ETS2 Flare Editor & Preview</h1>
-                <p>Editor flare dengan preview langsung</p>
-                <small style="opacity: 0.7;">💡 Tip: Gunakan Chrome/Edge terbaru untuk fitur Save As yang optimal</small>
-            </div>
-            <button class="theme-toggle">
-                🌙 Dark Theme
-            </button>
+<body>
+    <div class="maintenance-container">
+        <div class="maintenance-icon">🔧</div>
+        
+        <h1 class="maintenance-title">Under Maintenance</h1>
+        <h2 class="maintenance-subtitle">Mode Pemeliharaan</h2>
+        
+        <p class="maintenance-message">
+            ETS2 Flare Tools sedang dalam tahap pengembangan dan pemeliharaan untuk memberikan pengalaman yang lebih baik.
+        </p>
+
+        <div class="maintenance-features">
+            <h3 style="color: #FFD700; margin-bottom: 20px; text-align: center;">🚀 Fitur Yang Sedang Dikembangkan</h3>
+            <ul class="feature-list">
+                <li>Enhanced Error Handling & Safe Loading</li>
+                <li>Improved Vehicle Flare Animations</li>
+                <li>Advanced Model Scale Properties</li>
+                <li>Better UI/UX with Responsive Design</li>
+                <li>Performance Optimizations</li>
+                <li>Additional Flare Types Support</li>
+            </ul>
         </div>
 
-        <div class="upload-section">
-            <div class="file-controls">
-                <div class="file-input-wrapper">
-                    <input type="file" id="fileInput" class="file-input" accept=".sii">
-                    <button class="file-input-button">
-                        📁 Load .sii File
-                    </button>
-                </div>
-                <div class="save-buttons">
-                    <button class="control-button" onclick="showAddFlareModal()">
-                        ➕  ADD Flare
-                    </button>
-                    <button class="control-button primary" id="saveButton" disabled>
-                        💾 Simpan File
-                    </button>
-                </div>
-            </div>
+        <div class="progress-bar">
+            <div class="progress-fill"></div>
         </div>
 
-        <div id="flareSection" class="flare-section">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                <h2 style="color: var(--accent-primary); margin: 0;">🔧 Flare Configuration</h2>
-                <div id="currentFileName" style="color: var(--text-secondary); font-size: 14px; opacity: 0.8;">
-                    <!-- File name will be displayed here -->
-                </div>
-            </div>
-            <div id="flareContainer"></div>
+        <div class="eta">
+            📅 Estimasi Selesai: Segera
         </div>
 
-        <!-- Add Flare Modal -->
-        <div id="addFlareModal" class="modal" style="display: none;">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h3>Add New Flare</h3>
-                    <button class="modal-close" onclick="closeAddFlareModal()">✕</button>
-                </div>
-                <div class="modal-body">
-                    <div class="editor-grid">
-                        <div class="editor-field">
-                            <label class="editor-label">Flare Type</label>
-                            <select id="newFlareType" class="editor-select">
-                                <option value="flare_blink">flare_blink (Blinking Pattern)</option>
-                                <option value="flare_vehicle">flare_vehicle (Static Vehicle)</option>
-                            </select>
-                        </div>
-                        <div class="editor-field">
-                            <label class="editor-label">Flare Name</label>
-                            <input type="text" id="newFlareName" class="editor-input" placeholder="e.g., flare.vehicle.front.left">
-                        </div>
-                    </div>
-                    <p class="modal-note">✨ Other properties can be edited after the flare is created</p>
-                </div>
-                <div class="modal-footer">
-                    <button class="control-button" type="button" onclick="event.preventDefault(); editor.createNewFlare();">Create Flare</button>
-                    <button class="control-button warning" type="button" onclick="closeAddFlareModal()">Cancel</button>
-                </div>
-            </div>
-        </div>
+        <p style="margin: 20px 0; opacity: 0.8;">
+            Terima kasih atas kesabaran Anda. Tool ini akan kembali online setelah pemeliharaan selesai.
+        </p>
 
-        <!-- Custom Alert Modal -->
-        <div id="alertModal" class="alert-modal">
-            <div class="alert-content">
-                <div class="alert-header">
-                    <span id="alertIcon" class="alert-icon">⚠️</span>
-                    <span id="alertTitle" class="alert-title">Alert</span>
-                </div>
-                <div id="alertMessage" class="alert-message">
-                    Message content goes here
-                </div>
-                <div class="alert-footer">
-                    <button id="alertButton" class="alert-button" onclick="closeAlert()">OK</button>
-                </div>
-            </div>
-        </div>
-
-        <div class="footer">
-            <p>ETS2 Flare Editor v2.1 | Copyright rw_aji</p>
+        <div class="contact-info">
+            <p style="margin-bottom: 20px; opacity: 0.9;">Butuh bantuan atau informasi lebih lanjut?</p>
+            <a href="https://github.com/RAHMANWAHYUAJI/ets2-flare-tools" class="contact-link">📂 GitHub Repository</a>
+            <a href="https://github.com/RAHMANWAHYUAJI/ets2-flare-tools/issues" class="contact-link">🐛 Report Issues</a>
         </div>
     </div>
-    
-    <!-- JavaScript Modules -->
-    <script src="assets/js/config.js"></script>
-    <script src="assets/js/state.js"></script>
-    <script src="assets/js/parser.js"></script>
-    <script src="assets/js/animation.js"></script>
-    <script src="assets/js/biasPreview.js"></script>
-    <script src="assets/js/ui.js"></script>
-    <script src="assets/js/editor.js"></script>
-    <script src="assets/js/fileManager.js"></script>
-    <script src="assets/js/main.js"></script>
+
+    <script>
+        // Add some subtle animations
+        document.addEventListener('DOMContentLoaded', function() {
+            const container = document.querySelector('.maintenance-container');
+            container.style.opacity = '0';
+            container.style.transform = 'translateY(20px)';
+            
+            setTimeout(() => {
+                container.style.transition = 'all 0.8s ease';
+                container.style.opacity = '1';
+                container.style.transform = 'translateY(0)';
+            }, 100);
+        });
+    </script>
 </body>
 </html>
