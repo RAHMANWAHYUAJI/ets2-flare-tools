@@ -26,7 +26,7 @@ A web-based editor for Euro Truck Simulator 2 flare files (.sii format).
 
 ## Live Demo
 
-Visit: [Your GitHub Pages URL]
+Visit: https://rahmanwahyuaji.github.io/ets2-flare-tools
 
 ## Installation
 
