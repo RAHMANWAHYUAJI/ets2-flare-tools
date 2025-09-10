@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ETS2 Flare Blink Editor & Preview</title>
+    <link rel="stylesheet" href="assets/style.css">
+</head>
+<body data-theme="dark">
+    <div class="container">
+        <div class="header">
+            <div class="header-content">
+                <h1>🚨 ETS2 Flare Editor & Preview</h1>
+                <p>Editor flare dengan preview langsung</p>
+                <small style="opacity: 0.7;">💡 Tip: Gunakan Chrome/Edge terbaru untuk fitur Save As yang optimal</small>
+            </div>
+            <button class="theme-toggle">
+                🌙 Dark Theme
+            </button>
+        </div>
+
+        <div class="upload-section">
+            <div class="file-controls">
+                <div class="file-input-wrapper">
+                    <input type="file" id="fileInput" class="file-input" accept=".sii">
+                    <button class="file-input-button">
+                        📁 Load .sii File
+                    </button>
+                </div>
+                <div class="save-buttons">
+                    <button class="control-button" onclick="showAddFlareModal()">
+                        ➕  ADD Flare
+                    </button>
+                    <button class="control-button primary" id="saveButton" disabled>
+                        💾 Simpan File
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="flareSection" class="flare-section">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2 style="color: var(--accent-primary); margin: 0;">🔧 Flare Configuration</h2>
+                <div id="currentFileName" style="color: var(--text-secondary); font-size: 14px; opacity: 0.8;">
+                    <!-- File name will be displayed here -->
+                </div>
+            </div>
+            <div id="flareContainer"></div>
+        </div>
+
+        <!-- Add Flare Modal -->
+        <div id="addFlareModal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Add New Flare</h3>
+                    <button class="modal-close" onclick="closeAddFlareModal()">✕</button>
+                </div>
+                <div class="modal-body">
+                    <div class="editor-grid">
+                        <div class="editor-field">
+                            <label class="editor-label">Flare Type</label>
+                            <select id="newFlareType" class="editor-select">
+                                <option value="flare_blink">flare_blink (Blinking Pattern)</option>
+                                <option value="flare_vehicle">flare_vehicle (Static Vehicle)</option>
+                            </select>
+                        </div>
+                        <div class="editor-field">
+                            <label class="editor-label">Flare Name</label>
+                            <input type="text" id="newFlareName" class="editor-input" placeholder="e.g., flare.vehicle.front.left">
+                        </div>
+                    </div>
+                    <p class="modal-note">✨ Other properties can be edited after the flare is created</p>
+                </div>
+                <div class="modal-footer">
+                    <button class="control-button" type="button" onclick="event.preventDefault(); editor.createNewFlare();">Create Flare</button>
+                    <button class="control-button warning" type="button" onclick="closeAddFlareModal()">Cancel</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Custom Alert Modal -->
+        <div id="alertModal" class="alert-modal">
+            <div class="alert-content">
+                <div class="alert-header">
+                    <span id="alertIcon" class="alert-icon">⚠️</span>
+                    <span id="alertTitle" class="alert-title">Alert</span>
+                </div>
+                <div id="alertMessage" class="alert-message">
+                    Message content goes here
+                </div>
+                <div class="alert-footer">
+                    <button id="alertButton" class="alert-button" onclick="closeAlert()">OK</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>ETS2 Flare Editor v2.1 | Copyright rw_aji</p>
+        </div>
+    </div>
+    
+    <!-- JavaScript Modules -->
+    <script src="assets/js/config.js"></script>
+    <script src="assets/js/state.js"></script>
+    <script src="assets/js/parser.js"></script>
+    <script src="assets/js/animation.js"></script>
+    <script src="assets/js/biasPreview.js"></script>
+    <script src="assets/js/ui.js"></script>
+    <script src="assets/js/editor.js"></script>
+    <script src="assets/js/fileManager.js"></script>
+    <script src="assets/js/main.js"></script>
+</body>
+</html>
