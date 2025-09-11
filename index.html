@@ -242,8 +242,8 @@
         <div class="visitor-stats">
             <h4 style="color: #FFD700; margin-bottom: 15px;">📊 Project Statistics</h4>
             <div class="stat-item">
-                <span class="stat-number" id="visitor-count">Loading...</span>
-                <span class="stat-label">Total Visitors</span>
+                <span class="stat-number" id="active-visitors">Loading...</span>
+                <span class="stat-label">Active Visitors</span>
             </div>
             <div class="stat-item">
                 <span class="stat-number" id="github-stars">-</span>
@@ -292,33 +292,22 @@
 
         // Initialize statistics
         function initializeStats() {
-            // Load visitor count from multiple sources
-            loadVisitorCount();
+            // Load active visitors and GitHub stats
+            loadActiveVisitors();
             loadGitHubStats();
+            
+            // Update active visitors every 30 seconds
+            setInterval(loadActiveVisitors, 30000);
         }
 
-        // Load visitor count using multiple counter services
-        function loadVisitorCount() {
-            // Method 1: hits.sh counter (simple and reliable)
-            fetch('https://hits.sh/rahmanwahyuaji.github.io/ets2-flare-tools.json')
-                .then(response => response.json())
-                .then(data => {
-                    document.getElementById('visitor-count').textContent = formatNumber(data.count);
-                })
-                .catch(() => {
-                    // Method 2: Alternative counter using GitHub API views (if available)
-                    fetch('https://api.github.com/repos/RAHMANWAHYUAJI/ets2-flare-tools/traffic/views')
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.count) {
-                                document.getElementById('visitor-count').textContent = formatNumber(data.count);
-                            } else {
-                                // Fallback: Use localStorage for basic counting
-                                useLocalStorageCounter();
-                            }
-                        })
-                        .catch(() => useLocalStorageCounter());
-                });
+        // Load active visitors count
+        function loadActiveVisitors() {
+            // Register this visitor as active
+            registerActiveVisitor();
+            
+            // Get count of active visitors (last 5 minutes)
+            const activeCount = getActiveVisitorsCount();
+            document.getElementById('active-visitors').textContent = formatNumber(activeCount);
         }
 
         // Load GitHub repository statistics
@@ -335,13 +324,59 @@
                 });
         }
 
-        // Fallback local storage counter
-        function useLocalStorageCounter() {
-            const storageKey = 'ets2-flare-tools-visits';
-            let visits = localStorage.getItem(storageKey) || 0;
-            visits = parseInt(visits) + 1;
-            localStorage.setItem(storageKey, visits);
-            document.getElementById('visitor-count').textContent = formatNumber(visits);
+        // Register this visitor as active
+        function registerActiveVisitor() {
+            const storageKey = 'ets2-active-visitors';
+            const sessionId = getSessionId();
+            const now = Date.now();
+            
+            // Get current active visitors list
+            let activeVisitors = JSON.parse(localStorage.getItem(storageKey) || '{}');
+            
+            // Clean up old visitors (older than 5 minutes)
+            const fiveMinutesAgo = now - (5 * 60 * 1000);
+            Object.keys(activeVisitors).forEach(id => {
+                if (activeVisitors[id] < fiveMinutesAgo) {
+                    delete activeVisitors[id];
+                }
+            });
+            
+            // Register current visitor
+            activeVisitors[sessionId] = now;
+            
+            // Save back to localStorage
+            localStorage.setItem(storageKey, JSON.stringify(activeVisitors));
+        }
+
+        // Get count of active visitors
+        function getActiveVisitorsCount() {
+            const storageKey = 'ets2-active-visitors';
+            const activeVisitors = JSON.parse(localStorage.getItem(storageKey) || '{}');
+            const now = Date.now();
+            const fiveMinutesAgo = now - (5 * 60 * 1000);
+            
+            // Count visitors active in last 5 minutes
+            let count = 0;
+            Object.values(activeVisitors).forEach(timestamp => {
+                if (timestamp > fiveMinutesAgo) {
+                    count++;
+                }
+            });
+            
+            return Math.max(count, 1); // Always show at least 1 (current user)
+        }
+
+        // Get or create session ID
+        function getSessionId() {
+            const sessionKey = 'ets2-session-id';
+            let sessionId = sessionStorage.getItem(sessionKey);
+            
+            if (!sessionId) {
+                sessionId = 'visitor_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+                sessionStorage.setItem(sessionKey, sessionId);
+            }
+            
+            return sessionId;
         }
 
         // Format numbers with commas

@@ -26,8 +26,8 @@ const analytics = {
                 opacity: 0.8;
             ">
                 <div class="stat-item" style="display: flex; align-items: center; gap: 5px;">
-                    <span>👥</span>
-                    <span>Visitors: <strong id="visitor-count">Loading...</strong></span>
+                    <span>�</span>
+                    <span>Active: <strong id="active-visitors">Loading...</strong></span>
                 </div>
                 <div class="stat-item" style="display: flex; align-items: center; gap: 5px;">
                     <span>⭐</span>
@@ -45,31 +45,21 @@ const analytics = {
 
     // Load all statistics
     loadStats() {
-        this.loadVisitorCount();
+        this.loadActiveVisitors();
         this.loadGitHubStats();
+        
+        // Update active visitors every 30 seconds
+        setInterval(() => this.loadActiveVisitors(), 30000);
     },
 
-    // Load visitor count from multiple sources
-    loadVisitorCount() {
-        // Method 1: hits.sh counter (reliable and simple)
-        fetch('https://hits.sh/rahmanwahyuaji.github.io/ets2-flare-tools.json')
-            .then(response => response.json())
-            .then(data => {
-                this.updateVisitorCount(data.count);
-            })
-            .catch(() => {
-                // Method 2: GitHub API traffic views (requires auth for private repos)
-                fetch('https://api.github.com/repos/RAHMANWAHYUAJI/ets2-flare-tools/traffic/views')
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.count) {
-                            this.updateVisitorCount(data.count);
-                        } else {
-                            this.useLocalStorageCounter();
-                        }
-                    })
-                    .catch(() => this.useLocalStorageCounter());
-            });
+    // Load active visitors count
+    loadActiveVisitors() {
+        // Register this visitor as active
+        this.registerActiveVisitor();
+        
+        // Get count of active visitors (last 5 minutes)
+        const activeCount = this.getActiveVisitorsCount();
+        this.updateActiveVisitors(activeCount);
     },
 
     // Load GitHub repository statistics
@@ -84,12 +74,67 @@ const analytics = {
             });
     },
 
-    // Update visitor count display
-    updateVisitorCount(count) {
-        const element = document.getElementById('visitor-count');
+    // Update active visitors display
+    updateActiveVisitors(count) {
+        const element = document.getElementById('active-visitors');
         if (element) {
             element.textContent = this.formatNumber(count);
         }
+    },
+
+    // Register this visitor as active
+    registerActiveVisitor() {
+        const storageKey = 'ets2-active-visitors';
+        const sessionId = this.getSessionId();
+        const now = Date.now();
+        
+        // Get current active visitors list
+        let activeVisitors = JSON.parse(localStorage.getItem(storageKey) || '{}');
+        
+        // Clean up old visitors (older than 5 minutes)
+        const fiveMinutesAgo = now - (5 * 60 * 1000);
+        Object.keys(activeVisitors).forEach(id => {
+            if (activeVisitors[id] < fiveMinutesAgo) {
+                delete activeVisitors[id];
+            }
+        });
+        
+        // Register current visitor
+        activeVisitors[sessionId] = now;
+        
+        // Save back to localStorage
+        localStorage.setItem(storageKey, JSON.stringify(activeVisitors));
+    },
+
+    // Get count of active visitors
+    getActiveVisitorsCount() {
+        const storageKey = 'ets2-active-visitors';
+        const activeVisitors = JSON.parse(localStorage.getItem(storageKey) || '{}');
+        const now = Date.now();
+        const fiveMinutesAgo = now - (5 * 60 * 1000);
+        
+        // Count visitors active in last 5 minutes
+        let count = 0;
+        Object.values(activeVisitors).forEach(timestamp => {
+            if (timestamp > fiveMinutesAgo) {
+                count++;
+            }
+        });
+        
+        return Math.max(count, 1); // Always show at least 1 (current user)
+    },
+
+    // Get or create session ID
+    getSessionId() {
+        const sessionKey = 'ets2-session-id';
+        let sessionId = sessionStorage.getItem(sessionKey);
+        
+        if (!sessionId) {
+            sessionId = 'visitor_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+            sessionStorage.setItem(sessionKey, sessionId);
+        }
+        
+        return sessionId;
     },
 
     // Update GitHub stats display
@@ -101,30 +146,16 @@ const analytics = {
         if (forksElement) forksElement.textContent = this.formatNumber(forks);
     },
 
-    // Fallback local storage counter
+    // Fallback local storage counter (not used for active visitors)
     useLocalStorageCounter() {
-        const storageKey = 'ets2-flare-tools-visits';
-        let visits = localStorage.getItem(storageKey) || 0;
-        visits = parseInt(visits) + 1;
-        localStorage.setItem(storageKey, visits);
-        this.updateVisitorCount(visits);
+        // Not applicable for active visitors
+        this.updateActiveVisitors(1);
     },
 
-    // Track visitor (increment counter)
+    // Track visitor (register as active)
     trackVisitor() {
-        // Simple tracking - hits.sh automatically increments
-        fetch('https://hits.sh/rahmanwahyuaji.github.io/ets2-flare-tools', {
-            method: 'GET',
-            mode: 'no-cors'
-        }).catch(() => {
-            // Silent fail if service unavailable
-        });
-
-        // Also track page view in localStorage for backup
-        const storageKey = 'ets2-flare-tools-page-views';
-        let pageViews = localStorage.getItem(storageKey) || 0;
-        pageViews = parseInt(pageViews) + 1;
-        localStorage.setItem(storageKey, pageViews);
+        // Register as active visitor
+        this.registerActiveVisitor();
     },
 
     // Format numbers with commas
