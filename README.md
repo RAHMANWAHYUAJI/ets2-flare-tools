@@ -1,36 +1,38 @@
 # ETS2 Flare Tools
 
-A web-based editor for Euro Truck Simulator 2 flare files (.sii format).
+Editor berbasis web untuk berkas flare Euro Truck Simulator 2 (.sii format).
 
-## Features
+## Fitur
 
-- 🔧 Edit flare properties (brightness, color, patterns)
-- 🎨 Real-time bias preview with cone visualization
-- 📁 Load and save .sii files
-- 🎯 Automatic bias detection from inline properties
-- ⚡ Modern, responsive interface
+- 🔧 Edit properti flare (kecerahan, warna, pola)
+- 🎨 Pratinjau bias waktu nyata dengan visualisasi kerucut
+- 📁 Muat dan simpan berkas .sii
+- 🎯 Deteksi bias otomatis dari properti inline
+- ⚡ Antarmuka modern dan responsif
 
-## Usage
+## Penggunaan
 
-1. Open the tool in your web browser
-2. Click "Choose File" to load an ETS2 flare .sii file
-3. Edit flare properties using the intuitive interface
-4. Preview bias changes in real-time
-5. Download the modified file
+1. Buka alat ini di browser web Anda
+2. Klik “Pilih File” untuk memuat berkas flare ETS2 .sii
+3. Edit properti flare menggunakan antarmuka yang intuitif
+4. Pratinjau perubahan bias secara real-time
+5. Unduh berkas yang telah dimodifikasi
 
-## File Format Support
+## Dukungan Format Berkas
 
-- ETS2 SII flare files
-- Inline bias properties detection
-- HSL color system (candela_hue_saturation, lumen_hue_saturation, lux_hue_saturation)
+- Berkas flare ETS2 SII
+- Deteksi properti bias inline
+- Sistem warna HSL (candela_hue_saturation, lumen_hue_saturation, lux_hue_saturation)
 
-## Live Demo
+## Demo Langsung
 
-Visit: https://rahmanwahyuaji.github.io/ets2-flare-tools
+Kunjungi: https://rahmanwahyuaji.github.io/ets2-flare-tools
 
-## Installation
+## Instalasi
 
-Simply clone this repository and open `index.html` in your web browser. No additional setup required!
+Cukup kloning repositori ini dan buka `index.html` di browser web Anda. Tidak diperlukan pengaturan tambahan!
+
+Translated with DeepL.com (free version)
 
 ```bash
 git clone https://github.com/yourusername/ets2-flare-tools.git
@@ -38,7 +40,7 @@ cd ets2-flare-tools
 # Open index.html in your browser
 ```
 
-## Technologies Used
+## Teknologi yang Digunakan
 
 - Vanilla JavaScript (ES6+)
 - HTML5 File API
@@ -47,4 +49,4 @@ cd ets2-flare-tools
 
 ## License
 
-Open source - feel free to use and modify!
+Open source - silakan gunakan dan modifikasi sesuka hati!
