@@ -95,7 +95,10 @@
         </div>
 
         <div class="footer">
-            <p>ETS2 Flare Editor v2.1 | Copyright rw_aji</p>
+            <p>ETS2 Flare Editor v2.1 | Copyright rw_aji | 
+            <a href="https://paypal.me/rwakaroseri" target="_blank" style="color: var(--accent-primary); text-decoration: none;">💳 PayPal</a> | 
+            <a href="#" onclick="showDanaInfo(); return false;" style="color: var(--accent-primary); text-decoration: none;">💰 Dana</a>
+            </p>
         </div>
     </div>
     
@@ -110,5 +113,21 @@
     <script src="assets/js/fileManager.js"></script>
     <script src="assets/js/analytics.js"></script>
     <script src="assets/js/main.js"></script>
+
+    <script>
+        // Show Dana donation info using analytics module
+        function showDanaInfo() {
+            if (typeof analytics !== 'undefined' && analytics.showDanaInfo) {
+                analytics.showDanaInfo();
+            } else {
+                // Fallback to ui.showAlert
+                ui.showAlert(
+                    '💰 Donasi via Dana\n\nNomor: 085155102275\na.n: Rahman Wahyu Aji\n\nTerima kasih atas dukungan Anda! 🙏',
+                    'info',
+                    'Donation Info'
+                );
+            }
+        }
+    </script>
 </body>
 </html>

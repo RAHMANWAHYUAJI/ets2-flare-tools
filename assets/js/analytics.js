@@ -48,8 +48,8 @@ const analytics = {
         this.loadActiveVisitors();
         this.loadGitHubStats();
         
-        // Update active visitors every 30 seconds
-        setInterval(() => this.loadActiveVisitors(), 30000);
+        // Update active visitors every 1 second for real-time updates
+        setInterval(() => this.loadActiveVisitors(), 1000);
     },
 
     // Load active visitors count
@@ -191,6 +191,20 @@ const analytics = {
             pageViews: localStorage.getItem('ets2-flare-tools-page-views'),
             events: JSON.parse(localStorage.getItem('ets2-flare-tools-events') || '[]')
         };
+    },
+
+    // Show donation info using the existing UI system
+    showDanaInfo() {
+        if (typeof ui !== 'undefined' && ui.showAlert) {
+            ui.showAlert(
+                '💰 Donasi via Dana\n\nNomor: 085155102275\na.n: Rahman Wahyu Aji\n\nTerima kasih atas dukungan Anda! 🙏',
+                'info',
+                'Donation Info'
+            );
+        } else {
+            // Fallback alert if ui.js not available
+            alert('💰 Donasi via Dana\n\nNomor: 085155102275\na.n: Rahman Wahyu Aji\n\nTerima kasih atas dukungan Anda! 🙏');
+        }
     }
 };
 
