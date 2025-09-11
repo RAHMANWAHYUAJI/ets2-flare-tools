@@ -14,10 +14,13 @@ const app = {
         // Bind events
         this.bindEvents();
         
+        // Initialize drag and drop
+        fileManager.initDragAndDrop();
+        
         // Check file system access support
         this.checkFileSystemSupport();
         
-        console.log(`${appConfig.name} - Ready with full functionality!`);
+        console.log(`${appConfig.name} - Ready with full functionality including Drag & Drop! 🎯`);
     },
 
     // Bind all event handlers

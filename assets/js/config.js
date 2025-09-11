@@ -50,30 +50,28 @@ const defaultFlareValues = {
         blinkPattern: '--',
         blinkStepLength: 0.1,
         stateChangeDuration: 0.001,
-        lightType: 'beacon',
+        lightType: 'parking',
         dirType: 'wide',
-        hasModel: false,
-        hasModelLightSource: false
+        hasModel: true,
+        hasModelLightSource: true
     },
     flare_vehicle: {
-        intensity: 1.0,
-        color: '(1, 1, 1)',
         stateChangeDuration: 0.001,
-        lightType: 'beacon',
+        lightType: 'parking',
         dirType: 'wide',
-        hasModel: false,
-        hasModelLightSource: false
+        hasModel: true,
+        hasModelLightSource: true
     },
     bias: {
         biasType: 'spot',
         biasSetup: 'candela_hue_saturation',
-        diffuseColor: '(400, 38, 100)',
-        specularColor: '(400, 38, 100)',
-        range: 30,
+        diffuseColor: '(100, 0, 0)',
+        specularColor: '(100, 0, 0)',
+        range: 1,
         innerAngle: 5,
-        outerAngle: 90,
-        fadeDistance: 140,
-        fadeSpan: 30
+        outerAngle: 150,
+        fadeDistance: 100,
+        fadeSpan: 100
     }
 };
 

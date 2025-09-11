@@ -205,6 +205,15 @@ ${updatedContent.trim()}
         // Fourth: Model (if not empty)
         if (flare.model && flare.model.trim() !== '') {
             definition += `\tmodel: "${flare.model}"\n`;
+            
+            // Add default_scale and scale_factor if they have values
+            if (flare.defaultScale && flare.defaultScale.toString().trim() !== '') {
+                definition += `\tdefault_scale: ${flare.defaultScale}\n`;
+            }
+            if (flare.scaleFactor && flare.scaleFactor.toString().trim() !== '') {
+                definition += `\tscale_factor: ${flare.scaleFactor}\n`;
+            }
+            
             definition += `\n`; // Empty line
         }
         
@@ -284,5 +293,114 @@ ${updatedContent.trim()}
             }
         };
         reader.readAsText(file);
+    },
+
+    // Initialize drag and drop functionality
+    initDragAndDrop() {
+        const dropZone = document.body; // Entire page as drop zone
+        let dragCounter = 0;
+
+        // Create drag overlay
+        const dragOverlay = document.createElement('div');
+        dragOverlay.id = 'drag-overlay';
+        dragOverlay.innerHTML = `
+            <div class="drag-content">
+                <div class="drag-icon">📁</div>
+                <h3>Drop your .sii file here</h3>
+                <p>Release to load ETS2 flare file</p>
+            </div>
+        `;
+        dragOverlay.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            color: white;
+            font-family: Arial, sans-serif;
+        `;
+        
+        const dragContent = dragOverlay.querySelector('.drag-content');
+        dragContent.style.cssText = `
+            text-align: center;
+            padding: 40px;
+            border: 3px dashed #4CAF50;
+            border-radius: 15px;
+            background: rgba(76, 175, 80, 0.1);
+        `;
+        
+        const dragIcon = dragOverlay.querySelector('.drag-icon');
+        dragIcon.style.cssText = `
+            font-size: 4em;
+            margin-bottom: 20px;
+            animation: bounce 2s infinite;
+        `;
+
+        // Add CSS animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes bounce {
+                0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+                40% { transform: translateY(-10px); }
+                60% { transform: translateY(-5px); }
+            }
+        `;
+        document.head.appendChild(style);
+        document.body.appendChild(dragOverlay);
+
+        // Prevent default drag behaviors on page
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+            });
+        });
+
+        // Handle drag enter/over
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropZone.addEventListener(eventName, (e) => {
+                if (eventName === 'dragenter') {
+                    dragCounter++;
+                }
+                
+                // Check if dragged item contains files
+                if (e.dataTransfer.types.includes('Files')) {
+                    dragOverlay.style.display = 'flex';
+                    dragOverlay.style.animation = 'fadeIn 0.3s ease-in-out';
+                }
+            });
+        });
+
+        // Handle drag leave
+        dropZone.addEventListener('dragleave', (e) => {
+            dragCounter--;
+            if (dragCounter <= 0) {
+                dragCounter = 0;
+                dragOverlay.style.display = 'none';
+            }
+        });
+
+        // Handle file drop
+        dropZone.addEventListener('drop', (e) => {
+            dragCounter = 0;
+            dragOverlay.style.display = 'none';
+            
+            const files = Array.from(e.dataTransfer.files);
+            const siiFile = files.find(file => file.name.toLowerCase().endsWith('.sii'));
+            
+            if (siiFile) {
+                ui.showAlert(`Loading file: ${siiFile.name}`, 'info');
+                this.loadSiiFile(siiFile);
+            } else if (files.length > 0) {
+                ui.showAlert('Please drop a .sii file (ETS2 flare file)', 'warning');
+            }
+        });
+
+        console.log('🎯 Drag & Drop initialized! You can now drag .sii files to the page');
     }
 };

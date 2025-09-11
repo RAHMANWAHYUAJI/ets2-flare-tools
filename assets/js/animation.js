@@ -43,25 +43,9 @@ const animation = {
                 if (char === 'X') {
                     light.className = 'flare-light active';
                     light.style.opacity = '1';
-                    
-                    // Activate light cone and range indicator for bias-enabled flares
-                    if (flare.hasBias) {
-                        const cone = document.getElementById(`cone-${index}`);
-                        const range = document.getElementById(`range-${index}`);
-                        if (cone) cone.className = 'light-cone active';
-                        if (range) range.className = 'range-indicator active';
-                    }
                 } else {
                     light.className = 'flare-light off';
                     light.style.opacity = '0.3';
-                    
-                    // Deactivate light cone and range indicator
-                    if (flare.hasBias) {
-                        const cone = document.getElementById(`cone-${index}`);
-                        const range = document.getElementById(`range-${index}`);
-                        if (cone) cone.className = 'light-cone';
-                        if (range) range.className = 'range-indicator';
-                    }
                 }
             }
             
@@ -112,14 +96,6 @@ const animation = {
             btn.innerHTML = '🔴 OFF';
             btn.className = 'control-button warning';
             btn.title = 'Click to turn ON';
-            
-            // Deactivate light cone and range indicator
-            if (flare.hasBias) {
-                const cone = document.getElementById(`cone-${index}`);
-                const range = document.getElementById(`range-${index}`);
-                if (cone) cone.className = 'light-cone';
-                if (range) range.className = 'range-indicator';
-            }
         } else {
             // Start animation
             this.startFlareAnimation(flare, index);
@@ -141,6 +117,21 @@ const animation = {
                 }
                 
                 // Turn off light initially
+                const light = document.getElementById(`light-${index}`);
+                if (light) {
+                    light.className = 'flare-light off';
+                    light.style.opacity = '0.3';
+                }
+            } else if (flare.type === 'flare_vehicle') {
+                // Initialize vehicle flare with OFF state
+                const btn = document.getElementById(`vehicle-toggle-btn-${index}`);
+                if (btn) {
+                    btn.innerHTML = '🔴 OFF';
+                    btn.className = 'control-button warning';
+                    btn.title = 'Click to turn ON';
+                }
+                
+                // Turn off vehicle light initially
                 const light = document.getElementById(`light-${index}`);
                 if (light) {
                     light.className = 'flare-light off';
@@ -232,6 +223,19 @@ const animation = {
         // Toggle vehicle flare state
         const isCurrentlyOn = light.classList.contains('active');
         
+        // Set transition animation berdasarkan stateChangeDuration
+        const stateChangeDuration = flare.stateChangeDuration || 0.001;
+        const transitionTime = stateChangeDuration * 1000; // Convert to milliseconds
+        
+        // Apply transition animation (smooth fade effect)
+        if (!light.dataset.transitionSet || light.dataset.lastTransition !== transitionTime.toString()) {
+            light.style.transitionDuration = `${transitionTime}ms`;
+            light.style.transitionProperty = 'opacity, box-shadow, transform, background';
+            light.style.transitionTimingFunction = 'ease-in-out';
+            light.dataset.transitionSet = 'true';
+            light.dataset.lastTransition = transitionTime.toString();
+        }
+        
         if (isCurrentlyOn) {
             // Turn OFF
             light.className = 'flare-light off';
@@ -239,29 +243,13 @@ const animation = {
             toggleBtn.innerHTML = '🔴 OFF';
             toggleBtn.className = 'control-button warning';
             toggleBtn.title = 'Click to turn ON';
-            
-            // Deactivate light cone and range indicator for bias-enabled flares
-            if (flare.hasBias) {
-                const cone = document.getElementById(`cone-${index}`);
-                const range = document.getElementById(`range-${index}`);
-                if (cone) cone.className = 'light-cone';
-                if (range) range.className = 'range-indicator';
-            }
         } else {
             // Turn ON
             light.className = 'flare-light active';
-            light.style.opacity = flare.intensity;
+            light.style.opacity = '1';
             toggleBtn.innerHTML = '🟢 ON';
             toggleBtn.className = 'control-button success';
             toggleBtn.title = 'Click to turn OFF';
-            
-            // Activate light cone and range indicator for bias-enabled flares
-            if (flare.hasBias) {
-                const cone = document.getElementById(`cone-${index}`);
-                const range = document.getElementById(`range-${index}`);
-                if (cone) cone.className = 'light-cone active';
-                if (range) range.className = 'range-indicator active';
-            }
         }
     }
 };

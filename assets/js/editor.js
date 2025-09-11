@@ -196,6 +196,8 @@ const editor = {
             lightType: defaults.lightType, // Use default light type
             model: '', // Empty by default
             modelLightSource: '', // Empty by default
+            defaultScale: '', // Empty by default - akan ditambahkan ke .sii hanya jika diisi
+            scaleFactor: '', // Empty by default - akan ditambahkan ke .sii hanya jika diisi
             hasModel: defaults.hasModel, // Default false
             hasModelLightSource: defaults.hasModelLightSource, // Default false
             hasBias: false // Default to no bias
@@ -221,6 +223,42 @@ const editor = {
         ui.closeAddFlareModal();
         ui.showFlareSection();
         ui.enableSaveButton();
+        
+        // Initialize new flare with OFF state
+        setTimeout(() => {
+            const newIndex = state.getFlareData().length - 1;
+            const flare = state.getFlareData()[newIndex];
+            
+            if (flare.type === 'flare_vehicle') {
+                const btn = document.getElementById(`vehicle-toggle-btn-${newIndex}`);
+                const light = document.getElementById(`light-${newIndex}`);
+                
+                if (btn) {
+                    btn.innerHTML = '🔴 OFF';
+                    btn.className = 'control-button warning';
+                    btn.title = 'Click to turn ON';
+                }
+                
+                if (light) {
+                    light.className = 'flare-light off';
+                    light.style.opacity = '0.3';
+                }
+            } else if (flare.type === 'flare_blink') {
+                const btn = document.getElementById(`toggle-btn-${newIndex}`);
+                const light = document.getElementById(`light-${newIndex}`);
+                
+                if (btn) {
+                    btn.innerHTML = '🔴 OFF';
+                    btn.className = 'control-button warning';
+                    btn.title = 'Click to turn ON';
+                }
+                
+                if (light) {
+                    light.className = 'flare-light off';
+                    light.style.opacity = '0.3';
+                }
+            }
+        }, 50);
         
         // Reset creation flag
         this.isCreating = false;
@@ -250,7 +288,14 @@ const editor = {
         const flareData = state.getFlareData();
         if (flareData[flareIndex].type === 'flare_blink') {
             const flare = flareData[flareIndex];
-            const patternArray = flare.blinkPattern.split('');
+            const pattern = flare.blinkPattern || '1';
+            
+            // Don't allow editing of simple patterns
+            if (pattern === '1' || pattern.length === 1) {
+                return;
+            }
+            
+            const patternArray = pattern.split('');
             
             patternArray[charIndex] = patternArray[charIndex] === 'X' ? '-' : 'X';
             flare.blinkPattern = patternArray.join('');
@@ -264,11 +309,12 @@ const editor = {
         const flareData = state.getFlareData();
         if (flareData[flareIndex].type === 'flare_blink') {
             const flare = flareData[flareIndex];
+            const pattern = flare.blinkPattern || '1';
             const builder = document.getElementById(`pattern-builder-${flareIndex}`);
             const input = document.getElementById(`pattern-input-${flareIndex}`);
             
-            if (builder) {
-                builder.innerHTML = flare.blinkPattern.split('').map((char, i) => 
+            if (builder && pattern !== '1' && pattern.length > 1) {
+                builder.innerHTML = pattern.split('').map((char, i) => 
                     `<div class="pattern-char ${char === 'X' ? 'active' : ''}" 
                          onclick="editor.togglePatternChar(${flareIndex}, ${i})" 
                          data-char="${char}">${char}</div>`
@@ -276,7 +322,7 @@ const editor = {
             }
             
             if (input) {
-                input.value = flare.blinkPattern;
+                input.value = pattern;
             }
         }
     },
@@ -284,13 +330,28 @@ const editor = {
     addPatternStep(index) {
         const flareData = state.getFlareData();
         if (flareData[index].type === 'flare_blink') {
-            const currentLength = flareData[index].blinkPattern.length;
-            if (currentLength < appConfig.maxPatternLength) {
-                flareData[index].blinkPattern += '-';
-                this.updatePatternDisplay(index);
-                animation.updateFlareAnimation(index);
+            const pattern = flareData[index].blinkPattern || '1';
+            
+            // If it's a simple pattern, convert to editable pattern first
+            if (pattern === '1' || pattern.length === 1) {
+                flareData[index].blinkPattern = 'X-';
+                flareData[index].isStatic = false;
             } else {
-                ui.showAlert(`Maximum pattern length is ${appConfig.maxPatternLength} characters`, 'warning');
+                const currentLength = pattern.length;
+                if (currentLength < appConfig.maxPatternLength) {
+                    flareData[index].blinkPattern += '-';
+                } else {
+                    ui.showAlert(`Maximum pattern length is ${appConfig.maxPatternLength} characters`, 'warning');
+                    return;
+                }
+            }
+            
+            this.updatePatternDisplay(index);
+            animation.updateFlareAnimation(index);
+            
+            // Refresh UI if we converted from simple pattern
+            if (pattern === '1' || pattern.length === 1) {
+                ui.displayFlares();
             }
         }
     },
@@ -298,9 +359,16 @@ const editor = {
     removePatternStep(index) {
         const flareData = state.getFlareData();
         if (flareData[index].type === 'flare_blink') {
-            const currentLength = flareData[index].blinkPattern.length;
+            const pattern = flareData[index].blinkPattern || '1';
+            
+            // Don't remove from simple patterns
+            if (pattern === '1' || pattern.length === 1) {
+                return;
+            }
+            
+            const currentLength = pattern.length;
             if (currentLength > appConfig.minPatternLength) {
-                flareData[index].blinkPattern = flareData[index].blinkPattern.slice(0, -1);
+                flareData[index].blinkPattern = pattern.slice(0, -1);
                 this.updatePatternDisplay(index);
                 animation.updateFlareAnimation(index);
             } else {
@@ -312,8 +380,15 @@ const editor = {
     resetPattern(index) {
         const flareData = state.getFlareData();
         if (flareData[index].type === 'flare_blink') {
+            const pattern = flareData[index].blinkPattern || '1';
+            
+            // Don't reset simple patterns
+            if (pattern === '1' || pattern.length === 1) {
+                return;
+            }
+            
             // Replace all 'X' with '-' to clear the pattern
-            flareData[index].blinkPattern = flareData[index].blinkPattern.replace(/X/g, '-');
+            flareData[index].blinkPattern = pattern.replace(/X/g, '-');
             this.updatePatternDisplay(index);
             animation.updateFlareAnimation(index);
         }
@@ -322,9 +397,18 @@ const editor = {
     updatePatternFromInput(index, value) {
         const flareData = state.getFlareData();
         if (flareData[index].type === 'flare_blink') {
+            // Handle empty or invalid input - set to simple pattern
+            if (!value || value.trim() === '') {
+                flareData[index].blinkPattern = '1';
+                flareData[index].isStatic = true;
+                ui.displayFlares();
+                return;
+            }
+            
             const cleanPattern = value.replace(/[^X\-]/g, '');
             if (cleanPattern.length > 0 && cleanPattern.length <= appConfig.maxPatternLength) {
                 flareData[index].blinkPattern = cleanPattern;
+                flareData[index].isStatic = false;
                 this.updatePatternDisplay(index);
                 animation.updateFlareAnimation(index);
             } else if (cleanPattern.length > appConfig.maxPatternLength) {
@@ -339,6 +423,22 @@ const editor = {
     },
 
     // Validation functions
+    // Enable pattern editing for static flares
+    enablePatternEditing(index) {
+        const flareData = state.getFlareData();
+        if (flareData[index].type === 'flare_blink') {
+            // Set default blink pattern
+            flareData[index].blinkPattern = 'X-';
+            flareData[index].isStatic = false;
+            
+            // Refresh the UI to show pattern editor
+            ui.displayFlares();
+            
+            // Start animation
+            animation.updateFlareAnimation(index);
+        }
+    },
+
     validateFlareName(name) {
         return name && name.trim().length > 0 && /^[a-zA-Z0-9._-]+$/.test(name.trim());
     },

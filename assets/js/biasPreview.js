@@ -17,20 +17,23 @@ const biasPreview = {
         return { r: 255, g: 200, b: 100 }; // Default warm light
     },
 
-    // Convert ETS2 HSL system to RGB
-    hslToRgb(hue, saturation, brightness, biasSetup) {
+    // Convert ETS2 HSL system to RGB with intensity-based luminance
+    hslToRgb(hue, saturation, intensity, biasSetup) {
         // Normalize values
         const h = ((hue % 360) + 360) % 360; // 0-360
         const s = Math.max(0, Math.min(100, saturation)) / 100; // 0-1
         
-        // Adjust brightness based on setup type
-        let lightness;
-        if (biasSetup === 'lux_hue_saturation') {
-            lightness = Math.max(0.2, Math.min(0.9, brightness / 200)); // Lux tends to be higher values
-        } else if (biasSetup === 'lumen_hue_saturation') {
-            lightness = Math.max(0.3, Math.min(0.8, brightness / 150)); // Lumen moderate values
-        } else { // candela_hue_saturation
-            lightness = Math.max(0.4, Math.min(0.7, brightness / 100)); // Candela lower values
+        // Intensity system: higher values = more luminous but keep color
+        // Tidak seperti brightness yang memutih, intensity mempertahankan warna
+        let baseColor, lightness;
+        
+        if (s === 0) {
+            // Grayscale: intensity langsung ke lightness
+            lightness = Math.max(0, Math.min(1.0, intensity / 100));
+        } else {
+            // Colored light: intensity mempengaruhi luminance tapi tetap berwarna
+            // Gunakan lightness moderat agar warna tidak hilang
+            lightness = Math.max(0, Math.min(0.6, intensity / 100 * 0.6));
         }
         
         // Convert HSL to RGB
@@ -59,7 +62,9 @@ const biasPreview = {
             b: Math.round((b + m) * 255),
             hue: h,
             saturation: s * 100,
-            brightness: brightness
+            brightness: intensity,
+            intensity: intensity, // Tambahan untuk intensity tracking
+            lightness: lightness  // Lightness yang digunakan untuk warna dasar
         };
     },
 
@@ -73,58 +78,38 @@ const biasPreview = {
         const biasSetup = flare.biasSetup || 'candela_hue_saturation';
         
         const diffuseColor = this.parseDiffuseColor(flare.diffuseColor || "(80, 55, 100)", biasSetup);
+        const brightness = diffuseColor.brightness || 0; // Ambil brightness dari parsed color
         
         return `
-            <div class="modern-bias-preview" id="bias-preview-${index}" style="
-                display: flex;
-                background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
-                border-radius: 12px;
-                padding: 20px;
-                border: 1px solid var(--border-color);
-                gap: 24px;
+            <div class="interactive-cone-container" id="bias-preview-${index}" style="
+                background: radial-gradient(ellipse at center, #0a0a0a 0%, #1a1a1a 100%);
+                border-radius: 8px;
+                padding: 15px;
+                border: 1px solid #333;
                 min-height: 280px;
+                position: relative;
+                cursor: pointer;
+                transition: all 0.3s ease;
             ">
-                <!-- Left Side: 3D Light Cone Visualization -->
-                <div class="cone-visualization" style="
-                    flex: 1;
-                    display: flex;
-                    flex-direction: column;
-                    align-items: center;
-                ">
-                    <h6 style="color: var(--text-secondary); margin: 0 0 15px 0; font-size: 13px; text-align: center;">
-                        🔦 Light Cone Projection
-                    </h6>
-                    ${this.createModernConeVisualization(flare, index, diffuseColor)}
-                </div>
-                
-                <!-- Right Side: Fade Analysis & Settings -->
-                <div class="fade-analysis" style="
-                    flex: 1;
-                    display: flex;
-                    flex-direction: column;
-                ">
-                    <h6 style="color: var(--text-secondary); margin: 0 0 15px 0; font-size: 13px; text-align: center;">
-                        📊 Fade & Performance Analysis
-                    </h6>
-                    ${this.createFadeVisualization(flare, index, diffuseColor)}
-                    ${this.createPerformanceAnalysis(flare, index, diffuseColor)}
-                </div>
+                ${this.createInteractiveConeVisualization(flare, index, diffuseColor, brightness)}
             </div>
         `;
     },
 
-    // Create modern cone visualization pointing right
-    createModernConeVisualization(flare, index, diffuseColor) {
+    // Create enhanced cone visualization with gradient control
+    createEnhancedConeVisualization(flare, index, diffuseColor) {
         const innerAngle = flare.innerAngle || 5;
         const outerAngle = flare.outerAngle || 90;
         const range = flare.range || 30;
+        const fadeDistance = flare.fadeDistance || 140;
+        const fadeSpan = flare.fadeSpan || 30;
         
-        // Calculate cone dimensions (facing right)
-        const svgWidth = 240;
-        const svgHeight = 180;
-        const startX = 20;
+        // Calculate cone dimensions (facing right) - larger size for full width
+        const svgWidth = 320;
+        const svgHeight = 200;
+        const startX = 30;
         const centerY = svgHeight / 2;
-        const coneLength = Math.min(180, range * 4);
+        const coneLength = Math.min(250, range * 5);
         
         // Calculate cone angles for right-facing cone
         const innerRadians = (innerAngle * Math.PI) / 180;
@@ -137,35 +122,43 @@ const biasPreview = {
         const outerBottomY = centerY + Math.tan(outerRadians / 2) * coneLength;
         const endX = startX + coneLength;
         
-        // Color calculations
+        // Color calculations with fade control
         const lightColor = `rgb(${diffuseColor.r}, ${diffuseColor.g}, ${diffuseColor.b})`;
         const lightColorAlpha = `rgba(${diffuseColor.r}, ${diffuseColor.g}, ${diffuseColor.b}, 0.6)`;
-        const lightColorFade = `rgba(${diffuseColor.r}, ${diffuseColor.g}, ${diffuseColor.b}, 0.1)`;
+        
+        // Calculate fade gradient based on fade distance and span
+        const fadeRatio = fadeSpan / fadeDistance;
+        const fadeStart = Math.max(0.2, 1 - fadeRatio);
+        const lightColorFade = `rgba(${diffuseColor.r}, ${diffuseColor.g}, ${diffuseColor.b}, ${fadeStart * 0.3})`;
         
         return `
             <div style="
-                background: radial-gradient(ellipse at center, #0a0a0a 0%, #000000 100%);
+                background: radial-gradient(ellipse at center, #0a0a0a 0%, #1a1a1a 100%);
                 border-radius: 8px;
-                padding: 10px;
+                padding: 15px;
                 border: 1px solid #333;
+                display: flex;
+                justify-content: center;
             ">
                 <svg width="${svgWidth}" height="${svgHeight}" style="display: block;">
                     <defs>
-                        <!-- Gradient for outer cone -->
+                        <!-- Enhanced gradient for outer cone with fade control -->
                         <linearGradient id="outerConeGrad-${index}" x1="0%" y1="0%" x2="100%" y2="0%">
                             <stop offset="0%" style="stop-color:${lightColorAlpha};stop-opacity:0.7" />
+                            <stop offset="${fadeStart * 100}%" style="stop-color:${lightColorAlpha};stop-opacity:0.4" />
                             <stop offset="100%" style="stop-color:${lightColorFade};stop-opacity:0.1" />
                         </linearGradient>
                         
-                        <!-- Gradient for inner cone -->
+                        <!-- Enhanced gradient for inner cone -->
                         <linearGradient id="innerConeGrad-${index}" x1="0%" y1="0%" x2="100%" y2="0%">
                             <stop offset="0%" style="stop-color:${lightColor};stop-opacity:0.9" />
-                            <stop offset="100%" style="stop-color:${lightColorAlpha};stop-opacity:0.3" />
+                            <stop offset="${fadeStart * 100}%" style="stop-color:${lightColor};stop-opacity:0.6" />
+                            <stop offset="100%" style="stop-color:${lightColorAlpha};stop-opacity:0.2" />
                         </linearGradient>
                         
                         <!-- Glow filter -->
                         <filter id="glow-${index}">
-                            <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+                            <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
                             <feMerge> 
                                 <feMergeNode in="coloredBlur"/>
                                 <feMergeNode in="SourceGraphic"/>
@@ -180,11 +173,10 @@ const biasPreview = {
                              stroke-width="1" 
                              opacity="0.7"/>
                     
-                    <!-- Inner cone -->
+                    <!-- Inner cone - NO OUTLINE -->
                     <polygon points="${startX},${centerY} ${endX},${innerTopY} ${endX},${innerBottomY}"
                              fill="url(#innerConeGrad-${index})" 
-                             stroke="${lightColor}" 
-                             stroke-width="1.5"
+                             stroke="none"
                              filter="url(#glow-${index})"/>
                     
                     <!-- Light source point -->
@@ -200,7 +192,7 @@ const biasPreview = {
                     <line x1="${startX}" y1="${centerY + 25}" x2="${endX}" y2="${centerY + 25}"
                           stroke="${lightColorAlpha}" stroke-width="2" stroke-dasharray="3,3"/>
                     <text x="${startX + coneLength/2}" y="${centerY + 40}" 
-                          fill="var(--text-secondary)" font-size="11px" text-anchor="middle">
+                          fill="#888" font-size="11px" text-anchor="middle">
                         Range: ${range}m
                     </text>
                     
@@ -216,158 +208,291 @@ const biasPreview = {
         `;
     },
 
-    // Create fade distance visualization with gradients
-    createFadeVisualization(flare, index, diffuseColor) {
-        const fadeDistance = flare.fadeDistance || 140;
-        const fadeSpan = flare.fadeSpan || 30;
-        const range = flare.range || 30;
-        
-        // Calculate fade percentages
-        const fadeStartPercent = Math.max(0, ((fadeDistance - fadeSpan) / fadeDistance) * 100);
-        const fadeEndPercent = 100;
-        
-        const lightColor = `rgba(${diffuseColor.r}, ${diffuseColor.g}, ${diffuseColor.b}, 0.8)`;
-        const lightColorMid = `rgba(${diffuseColor.r}, ${diffuseColor.g}, ${diffuseColor.b}, 0.4)`;
-        const lightColorFade = `rgba(${diffuseColor.r}, ${diffuseColor.g}, ${diffuseColor.b}, 0.1)`;
-        
-        return `
-            <div class="fade-visualization" style="
-                background: var(--bg-primary);
-                border-radius: 8px;
-                padding: 15px;
-                border: 1px solid var(--border-color);
-                margin-bottom: 15px;
-            ">
-                <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 10px;">
-                    Distance Fade Profile:
-                </div>
-                
-                <!-- Fade gradient bar -->
-                <div style="
-                    height: 40px;
-                    background: linear-gradient(to right, 
-                        ${lightColor} 0%, 
-                        ${lightColor} ${fadeStartPercent}%, 
-                        ${lightColorMid} ${(fadeStartPercent + fadeEndPercent) / 2}%,
-                        ${lightColorFade} ${fadeEndPercent}%);
-                    border-radius: 6px;
-                    border: 1px solid var(--border-color);
-                    position: relative;
-                    margin-bottom: 10px;
-                ">
-                    <!-- Fade span indicator -->
-                    <div style="
-                        position: absolute;
-                        left: ${fadeStartPercent}%;
-                        right: ${100 - fadeEndPercent}%;
-                        top: -2px;
-                        bottom: -2px;
-                        border: 2px solid ${lightColor};
-                        border-radius: 6px;
-                        opacity: 0.6;
-                    "></div>
-                </div>
-                
-                <!-- Fade metrics -->
-                <div style="display: flex; justify-content: space-between; font-size: 11px; color: var(--text-secondary);">
-                    <span>0m</span>
-                    <span style="color: ${lightColor};">Fade Start: ${fadeDistance - fadeSpan}m</span>
-                    <span>Fade End: ${fadeDistance}m</span>
-                </div>
-                
-                <!-- Fade span info -->
-                <div style="
-                    margin-top: 8px;
-                    padding: 8px;
-                    background: var(--bg-secondary);
-                    border-radius: 4px;
-                    font-size: 11px;
-                    color: var(--text-secondary);
-                ">
-                    💡 Fade Span: <strong style="color: ${lightColor};">${fadeSpan}m</strong> 
-                    (${((fadeSpan / fadeDistance) * 100).toFixed(1)}% of total distance)
-                </div>
-            </div>
-        `;
-    },
-
-    // Create performance analysis
-    createPerformanceAnalysis(flare, index, diffuseColor) {
+    // Create interactive cone visualization with smart auto-framing
+    createInteractiveConeVisualization(flare, index, diffuseColor, brightness = 0) {
         const innerAngle = flare.innerAngle || 5;
         const outerAngle = flare.outerAngle || 90;
         const range = flare.range || 30;
         const fadeDistance = flare.fadeDistance || 140;
         const fadeSpan = flare.fadeSpan || 30;
         
-        // Calculate performance metrics
-        const focusDiff = outerAngle - innerAngle;
-        let focusLevel = 'Very Focused';
-        if (focusDiff > 60) focusLevel = 'Wide Spread';
-        else if (focusDiff > 30) focusLevel = 'Moderate';
-        else if (focusDiff > 15) focusLevel = 'Focused';
+        // Get current zoom level or calculate smart auto-zoom
+        let zoomLevel = (this.zoomLevels && this.zoomLevels[index]) ? 
+                       this.zoomLevels[index] : 
+                       this.calculateAutoZoom(outerAngle, range);
         
-        let rangeType = 'Short Range';
-        if (range > 100) rangeType = 'Long Range';
-        else if (range > 50) rangeType = 'Medium Range';
+        // Store zoom level for this cone
+        if (!this.zoomLevels) this.zoomLevels = {};
+        this.zoomLevels[index] = zoomLevel;
         
-        let performance = '✅ Optimal';
-        if (range > 100 && outerAngle > 120) performance = '⚠️ High Impact';
-        else if (range > 50 && outerAngle > 90) performance = '⚠️ Moderate Impact';
+        // Fixed container and padding
+        const containerWidth = 280;
+        const containerHeight = 240;
+        const padding = 15; // Reduced padding for better utilization
+        
+        // Calculate optimal cone dimensions with better space utilization
+        const availableWidth = containerWidth - (padding * 2);
+        const availableHeight = containerHeight - (padding * 2);
+        
+        // More aggressive cone length calculation
+        const baseConeLength = Math.max(100, Math.min(200, range * 5));
+        const coneLength = baseConeLength * zoomLevel;
+        
+        // Better positioning - center the cone more effectively
+        const startX = padding + 15;
+        const centerY = containerHeight / 2;
+        const endX = startX + coneLength;
+        
+        // Calculate cone angles for right-facing cone
+        const innerRadians = (innerAngle * Math.PI) / 180;
+        const outerRadians = (outerAngle * Math.PI) / 180;
+        
+        // Cone points with better scaling
+        const innerTopY = centerY - Math.tan(innerRadians / 2) * coneLength;
+        const innerBottomY = centerY + Math.tan(innerRadians / 2) * coneLength;
+        const outerTopY = centerY - Math.tan(outerRadians / 2) * coneLength;
+        const outerBottomY = centerY + Math.tan(outerRadians / 2) * coneLength;
+        
+        // Ensure cone fits within container bounds but allow closer to edges
+        const clampedOuterTopY = Math.max(padding + 5, outerTopY);
+        const clampedOuterBottomY = Math.min(containerHeight - padding - 5, outerBottomY);
+        const clampedInnerTopY = Math.max(padding + 5, innerTopY);
+        const clampedInnerBottomY = Math.min(containerHeight - padding - 5, innerBottomY);
+        
+        // Intensity-based luminance system (SCS ETS2 accurate)
+        // Intensity 0 = mati, 50 = normal, 100 = bright, 150 = sangat luminous dengan bloom
+        const intensity = brightness; // Gunakan nilai brightness sebagai intensity
+        let baseOpacity, bloomRadius, bloomIntensity;
+        
+        if (intensity === 0) {
+            // Mati total
+            baseOpacity = 0;
+            bloomRadius = 0;
+            bloomIntensity = 0;
+        } else if (intensity <= 50) {
+            // 1-50: dari redup ke normal
+            baseOpacity = Math.max(0.1, intensity / 50 * 0.7);
+            bloomRadius = 0;
+            bloomIntensity = 0;
+        } else if (intensity <= 100) {
+            // 50-100: dari normal ke bright dengan sedikit bloom
+            baseOpacity = 0.7 + (intensity - 50) / 50 * 0.25; // 0.7 - 0.95
+            bloomRadius = (intensity - 50) / 50 * 3; // 0 - 3px bloom
+            bloomIntensity = (intensity - 50) / 50 * 0.3; // 0 - 0.3 bloom opacity
+        } else {
+            // 100-150: sangat luminous dengan bloom kuat
+            baseOpacity = 0.95;
+            bloomRadius = 3 + (intensity - 100) / 50 * 7; // 3 - 10px bloom
+            bloomIntensity = 0.3 + (intensity - 100) / 50 * 0.5; // 0.3 - 0.8 bloom
+        }
+        
+        // Warna dasar tetap asli (tidak memutih)
+        const lightColor = `rgb(${diffuseColor.r}, ${diffuseColor.g}, ${diffuseColor.b})`;
+        const lightColorAlpha = `rgba(${diffuseColor.r}, ${diffuseColor.g}, ${diffuseColor.b}, ${baseOpacity})`;
+        
+        // Calculate fade gradient based on fade distance and span
+        const fadeRatio = fadeSpan / fadeDistance;
+        const fadeStart = Math.max(0.2, 1 - fadeRatio);
+        const fadeOpacity = baseOpacity * 0.6;
+        const lightColorFade = `rgba(${diffuseColor.r}, ${diffuseColor.g}, ${diffuseColor.b}, ${fadeStart * fadeOpacity})`;
+        
+        // Adaptive sizing based on zoom and container
+        const lightRadius = Math.max(5, Math.min(10, 7 * zoomLevel));
+        const strokeWidth = Math.max(1, Math.min(4, 2.5 * zoomLevel));
+        const fontSize = Math.max(9, Math.min(14, 11 * zoomLevel));
         
         return `
-            <div class="performance-analysis" style="
-                background: var(--bg-primary);
-                border-radius: 8px;
-                padding: 15px;
-                border: 1px solid var(--border-color);
+            <div style="
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                min-height: 240px;
+                overflow: hidden;
             ">
-                <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 12px;">
-                    Performance Analysis:
-                </div>
-                
-                <div style="display: flex; flex-direction: column; gap: 8px; font-size: 11px;">
-                    <div style="display: flex; justify-content: space-between;">
-                        <span style="color: var(--text-secondary);">Focus:</span>
-                        <span style="color: var(--accent-primary); font-weight: 500;">${focusLevel}</span>
-                    </div>
-                    <div style="display: flex; justify-content: space-between;">
-                        <span style="color: var(--text-secondary);">Range Type:</span>
-                        <span style="color: var(--accent-primary); font-weight: 500;">${rangeType}</span>
-                    </div>
-                    <div style="display: flex; justify-content: space-between;">
-                        <span style="color: var(--text-secondary);">Performance:</span>
-                        <span style="font-weight: 500;">${performance}</span>
-                    </div>
-                    <div style="display: flex; justify-content: space-between;">
-                        <span style="color: var(--text-secondary);">Fade Ratio:</span>
-                        <span style="color: var(--accent-primary); font-weight: 500;">${((fadeSpan / fadeDistance) * 100).toFixed(1)}%</span>
-                    </div>
-                </div>
-                
-                <!-- Quick stats with ETS2 HSL info -->
-                <div style="
-                    margin-top: 12px;
-                    padding: 8px;
-                    background: var(--bg-secondary);
-                    border-radius: 4px;
-                    font-size: 10px;
-                    color: var(--text-secondary);
-                    border-left: 3px solid var(--accent-primary);
-                ">
-                    <strong>Setup:</strong> ${flare.biasSetup || 'candela_hue_saturation'}<br>
-                    <strong>Type:</strong> ${flare.biasType || 'spot'} light<br>
-                    <strong>HSL Values:</strong> ${diffuseColor.brightness || 80}/${diffuseColor.hue || 55}°/${diffuseColor.saturation || 100}%<br>
-                    <small style="opacity: 0.8;">💡 Format: Brightness(${this.getBrightnessUnit(flare.biasSetup)})/Hue/Saturation</small>
-                </div>
+                <svg width="${containerWidth}" height="${containerHeight}" 
+                     style="display: block; transition: all 0.3s ease;" 
+                     id="cone-svg-${index}">
+                    <defs>
+                        <!-- Gradient untuk outer cone dengan fade natural -->
+                        <linearGradient id="outerConeGrad-${index}" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" style="stop-color:${lightColorAlpha};stop-opacity:${baseOpacity * 0.8}" />
+                            <stop offset="${fadeStart * 100}%" style="stop-color:${lightColorAlpha};stop-opacity:${baseOpacity * 0.5}" />
+                            <stop offset="100%" style="stop-color:${lightColorFade};stop-opacity:${baseOpacity * 0.1}" />
+                        </linearGradient>
+                        
+                        <!-- Gradient untuk inner cone dengan intensitas penuh -->
+                        <linearGradient id="innerConeGrad-${index}" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" style="stop-color:${lightColor};stop-opacity:${baseOpacity}" />
+                            <stop offset="${fadeStart * 100}%" style="stop-color:${lightColor};stop-opacity:${baseOpacity * 0.7}" />
+                            <stop offset="100%" style="stop-color:${lightColorAlpha};stop-opacity:${baseOpacity * 0.2}" />
+                        </linearGradient>
+                        
+                        <!-- Bloom effect untuk intensity tinggi -->
+                        ${bloomIntensity > 0 ? `
+                        <linearGradient id="bloomGrad-${index}" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" style="stop-color:${lightColor};stop-opacity:${bloomIntensity}" />
+                            <stop offset="30%" style="stop-color:${lightColor};stop-opacity:${bloomIntensity * 0.6}" />
+                            <stop offset="70%" style="stop-color:${lightColor};stop-opacity:${bloomIntensity * 0.3}" />
+                            <stop offset="100%" style="stop-color:${lightColor};stop-opacity:0" />
+                        </linearGradient>
+                        ` : ''}
+                        
+                        <!-- Glow filter dengan bloom dinamis -->
+                        <filter id="glow-${index}" x="-50%" y="-50%" width="200%" height="200%">
+                            <feGaussianBlur stdDeviation="${Math.max(2, 3 * zoomLevel + bloomRadius)}" result="coloredBlur"/>
+                            <feMerge> 
+                                <feMergeNode in="coloredBlur"/>
+                                <feMergeNode in="SourceGraphic"/>
+                            </feMerge>
+                        </filter>
+                        
+                        <!-- Bloom filter untuk intensity tinggi -->
+                        ${bloomIntensity > 0 ? `
+                        <filter id="bloom-${index}" x="-100%" y="-100%" width="300%" height="300%">
+                            <feGaussianBlur stdDeviation="${bloomRadius * 2}" result="bloomBlur"/>
+                            <feColorMatrix in="bloomBlur" type="matrix" 
+                                values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 ${bloomIntensity} 0"/>
+                        </filter>
+                        ` : ''}
+                    </defs>
+                    
+                    <!-- Bloom layer untuk intensity tinggi (di belakang) -->
+                    ${bloomIntensity > 0 ? `
+                    <polygon points="${startX},${centerY} ${endX},${clampedOuterTopY} ${endX},${clampedOuterBottomY}"
+                             fill="url(#bloomGrad-${index})" 
+                             stroke="none" 
+                             filter="url(#bloom-${index})"
+                             opacity="${bloomIntensity}"/>
+                    ` : ''}
+                    
+                    <!-- Outer cone dengan natural fading -->
+                    <polygon points="${startX},${centerY} ${endX},${clampedOuterTopY} ${endX},${clampedOuterBottomY}"
+                             fill="url(#outerConeGrad-${index})" 
+                             stroke="${lightColorFade}" 
+                             stroke-width="${strokeWidth}" 
+                             opacity="0.8"/>
+                    
+                    <!-- Inner cone dengan glow effect -->
+                    <polygon points="${startX},${centerY} ${endX},${clampedInnerTopY} ${endX},${clampedInnerBottomY}"
+                             fill="url(#innerConeGrad-${index})" 
+                             stroke="none"
+                             filter="url(#glow-${index})"/>
+                    
+                    <!-- Enhanced light source point dengan intensity bloom -->
+                    <circle cx="${startX}" cy="${centerY}" r="${lightRadius}" 
+                            fill="${lightColor}" 
+                            stroke="${lightColor}" 
+                            stroke-width="${strokeWidth}"
+                            opacity="${baseOpacity}"
+                            filter="url(#glow-${index})">
+                        ${intensity > 0 ? `<animate attributeName="opacity" values="${baseOpacity * 0.8};${baseOpacity};${baseOpacity * 0.8}" dur="2s" repeatCount="indefinite"/>` : ''}
+                    </circle>
+                    
+                    <!-- Extra bloom untuk intensity tinggi -->
+                    ${bloomIntensity > 0 ? `
+                    <circle cx="${startX}" cy="${centerY}" r="${lightRadius * 2}" 
+                            fill="${lightColor}" 
+                            stroke="none"
+                            opacity="${bloomIntensity * 0.4}"
+                            filter="url(#bloom-${index})"/>
+                    ` : ''}
+                    
+                    <!-- Range indicator with better visibility -->
+                    <line x1="${startX}" y1="${centerY + 25}" 
+                          x2="${endX}" y2="${centerY + 25}"
+                          stroke="${lightColorAlpha}" stroke-width="${strokeWidth}" 
+                          stroke-dasharray="4,4"/>
+                    
+                    <!-- Range text with better positioning -->
+                    <text x="${startX + coneLength/2}" y="${centerY + 40}" 
+                          fill="#bbb" font-size="${fontSize}px" text-anchor="middle">
+                        Range: ${range}m
+                    </text>
+                    
+                    <!-- Angle indicators with smart positioning -->
+                    <text x="${Math.min(containerWidth - padding - 45, endX + 8)}" 
+                          y="${Math.max(padding + 15, Math.min(containerHeight - padding - 15, clampedInnerTopY + fontSize/2))}" 
+                          fill="${lightColor}" font-size="${fontSize}px">
+                        Inner: ${innerAngle}°
+                    </text>
+                    <text x="${Math.min(containerWidth - padding - 45, endX + 8)}" 
+                          y="${Math.max(padding + 5, Math.min(containerHeight - padding - 5, clampedOuterTopY))}" 
+                          fill="${lightColorAlpha}" font-size="${fontSize}px">
+                        Outer: ${outerAngle}°
+                    </text>
+                </svg>
             </div>
         `;
     },
 
-    // Get brightness unit based on bias setup
-    getBrightnessUnit(biasSetup) {
-        if (biasSetup === 'lux_hue_saturation') return 'lux';
-        if (biasSetup === 'lumen_hue_saturation') return 'lumen';
-        return 'candela'; // default
+    // Calculate auto-zoom based on cone bounds (smart framing)
+    calculateAutoZoom(outerAngle, range) {
+        // Fixed container dimensions
+        const containerWidth = 280;
+        const containerHeight = 240;
+        const padding = 15; // Reduced padding for better space utilization
+        
+        // Available space after padding
+        const availableWidth = containerWidth - (padding * 2) - 50; // -50 for labels
+        const availableHeight = containerHeight - (padding * 2) - 40; // -40 for range indicator
+        
+        // Calculate cone dimensions based on angle constraints
+        const outerRadians = (outerAngle * Math.PI) / 180;
+        
+        // Base cone length calculation - more aggressive sizing
+        const baseConeLength = Math.max(80, Math.min(180, range * 4)); // Minimum 80px, maximum 180px
+        
+        // Calculate required height for this cone length and angle
+        const requiredHeight = 2 * Math.tan(outerRadians / 2) * baseConeLength;
+        
+        // Calculate scale factors to fit in available space
+        const widthScale = availableWidth / baseConeLength;
+        const heightScale = availableHeight / requiredHeight;
+        
+        // Use the more restrictive scale, but ensure minimum visibility
+        let optimalScale = Math.min(widthScale, heightScale);
+        
+        // Apply different scaling strategies based on angle
+        if (outerAngle <= 60) {
+            // For narrow angles, allow larger scaling
+            optimalScale = Math.min(optimalScale * 1.4, 2.0);
+        } else if (outerAngle <= 90) {
+            // For moderate angles, standard scaling
+            optimalScale = Math.min(optimalScale * 1.2, 1.5);
+        } else {
+            // For wide angles, more conservative scaling
+            optimalScale = Math.min(optimalScale * 1.0, 1.2);
+        }
+        
+        // Ensure minimum and maximum bounds for good visibility
+        return Math.max(0.6, Math.min(2.2, optimalScale));
+    },
+
+    // Refresh cone visualization with current zoom level
+    refreshConeVisualization(index) {
+        const flareData = state.getFlareData();
+        if (!flareData[index] || !flareData[index].hasBias) return;
+        
+        const svgContainer = document.getElementById(`cone-svg-${index}`);
+        if (!svgContainer) return;
+        
+        const flare = flareData[index];
+        const biasSetup = flare.biasSetup || 'candela_hue_saturation';
+        const diffuseColor = this.parseDiffuseColor(flare.diffuseColor || "(80, 55, 100)", biasSetup);
+        const brightness = diffuseColor.brightness || 0;
+        
+        // Get current zoom level
+        const zoomLevel = this.zoomLevels[index] || 1.0;
+        
+        // Update SVG content with new zoom
+        const newSvgContent = this.createInteractiveConeVisualization(flare, index, diffuseColor, brightness);
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = newSvgContent;
+        const newSvg = tempDiv.querySelector('svg');
+        
+        if (newSvg) {
+            svgContainer.parentNode.replaceChild(newSvg, svgContainer);
+        }
     },
 
     // Update preview when values change

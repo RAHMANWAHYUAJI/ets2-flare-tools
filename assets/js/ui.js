@@ -46,11 +46,18 @@ const ui = {
 
     // Create UI for blink flare
     createBlinkFlareUI(flare, index, lightTypeOptions, dirTypeOptions) {
-        const patternChars = flare.blinkPattern.split('').map((char, i) => 
-            `<div class="pattern-char ${char === 'X' ? 'active' : ''}" 
-                 onclick="editor.togglePatternChar(${index}, ${i})" 
-                 data-char="${char}">${char}</div>`
-        ).join('');
+        // Handle flare tanpa blink pattern atau pattern sederhana
+        const pattern = flare.blinkPattern || '1';
+        const isSimplePattern = pattern === '1' || pattern.length === 1;
+        
+        let patternChars = '';
+        if (!isSimplePattern) {
+            patternChars = pattern.split('').map((char, i) => 
+                `<div class="pattern-char ${char === 'X' ? 'active' : ''}" 
+                     onclick="editor.togglePatternChar(${index}, ${i})" 
+                     data-char="${char}">${char}</div>`
+            ).join('');
+        }
         
         return `
             <div class="flare-header">
@@ -59,7 +66,7 @@ const ui = {
                 <div class="flare-name" onclick="this.style.display='none'; this.previousElementSibling.style.display='block'; this.previousElementSibling.focus();" 
                      style="cursor: pointer;">${flare.name} <small style="opacity: 0.7;">(${flare.type})</small></div>
                 <div class="flare-actions">
-                    <button class="control-button warning" onclick="editor.deleteFlare(${index})">🗑️ Delete</button>
+                    <button class="control-button warning" onclick="editor.deleteFlare(${index})" style="padding: 8px 16px; font-size: 13px;">Delete</button>
                 </div>
             </div>
             <div class="flare-content">
@@ -90,7 +97,7 @@ const ui = {
                 <div class="flare-name" onclick="this.style.display='none'; this.previousElementSibling.style.display='block'; this.previousElementSibling.focus();" 
                      style="cursor: pointer;">${flare.name} <small style="opacity: 0.7;">(${flare.type})</small></div>
                 <div class="flare-actions">
-                    <button class="control-button warning" onclick="editor.deleteFlare(${index})">🗑️ Delete</button>
+                    <button class="control-button warning" onclick="editor.deleteFlare(${index})" style="padding: 8px 16px; font-size: 13px;">🗑️ Delete</button>
                 </div>
             </div>
             <div class="flare-content">
@@ -98,7 +105,7 @@ const ui = {
                     <div class="flare-light" id="light-${index}"></div>
                     <div class="preview-controls">
                         <button class="control-button warning" id="vehicle-toggle-btn-${index}" onclick="animation.toggleVehicleFlare(${index})" style="padding: 6px 12px; font-size: 12px; min-width: 60px;">
-                            🟢 ON
+                            � OFF
                         </button>
                     </div>
                 </div>
@@ -123,7 +130,7 @@ const ui = {
 
         return `
             <div style="display: flex; gap: 18px; align-items: center; margin-bottom: 12px;">
-                <div style="display: flex; align-items: center; gap: 4px; flex: 1;">
+                <div style="display: flex; align-items: center; gap: 30px; flex: 1;">
                     <label style="font-size: 12px; min-width: 35px;">Flare Type:</label>
                     <select class="editor-select" style="flex: 1; font-size: 12px;" onchange="editor.changeFlareType(${index}, this.value)">
                         <option value="flare_blink" ${flare.type === 'flare_blink' ? 'selected' : ''}>Blink</option>
@@ -150,13 +157,23 @@ const ui = {
                 </div>
             </div>
             <div style="display: flex; flex-direction: column; gap: 6px;">
-                <div style="display: flex; align-items: center; gap: 8px;">
+                <div style="display: flex; align-items: center; gap: 20px;">
                     <label class="editor-label" style="margin: 0; min-width: 65px; font-size: 13px;">Model:</label>
-                    <input type="text" class="editor-input" style="flex: 1;" value="${flare.model || ''}" placeholder="/vehicle/truck/model/accessory.pmd" onchange="editor.updateFlareProperty(${index}, 'model', this.value)" id="model-input-${index}">
+                    <input type="text" class="editor-input" style="flex: 2;" value="${flare.model || ''}" placeholder="Contoh: /model/flare.pmd | Kosongi jika tidak dipakai" onchange="editor.updateFlareProperty(${index}, 'model', this.value)" id="model-input-${index}">
+                    <div style="display: flex; align-items: center; gap: 4px;">
+                        <label class="editor-label" style="margin: 0; font-size: 11px; white-space: nowrap;">default_scale:</label>
+                        <input type="number" class="editor-input" style="width: 70px; font-size: 12px;" value="${flare.defaultScale || ''}" placeholder="0.0" step="0.01" min="0"
+                               onchange="editor.updateFlareProperty(${index}, 'defaultScale', this.value)" id="defaultscale-input-${index}">
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 4px;">
+                        <label class="editor-label" style="margin: 0; font-size: 11px; white-space: nowrap;">scale_factor:</label>
+                        <input type="number" class="editor-input" style="width: 70px; font-size: 12px;" value="${flare.scaleFactor || ''}" placeholder="0.0" step="0.01" min="0"
+                               onchange="editor.updateFlareProperty(${index}, 'scaleFactor', this.value)" id="scalefactor-input-${index}">
+                    </div>
                 </div>
                 <div style="display: flex; align-items: center; gap: 8px;">
-                    <label class="editor-label" style="margin: 0; min-width: 65px; font-size: 13px;">Light:</label>
-                    <input type="text" class="editor-input" style="flex: 1;" value="${flare.modelLightSource || ''}" placeholder="/vehicle/truck/model/light.pmd" onchange="editor.updateFlareProperty(${index}, 'modelLightSource', this.value)" id="modellight-input-${index}">
+                    <label class="editor-label" style="margin: 0; min-width: 65px; font-size: 13px;">Light Source:</label>
+                    <input type="text" class="editor-input" style="flex: 1;" value="${flare.modelLightSource || ''}" placeholder="Contoh: /model/light.pmd | Kosongi jika tidak dipakai" onchange="editor.updateFlareProperty(${index}, 'modelLightSource', this.value)" id="modellight-input-${index}">
                 </div>
             </div>
         `;
@@ -180,7 +197,9 @@ const ui = {
         return `
             <div class="bias-section" id="bias-section-${index}" style="margin-top: 20px; padding: 15px; background: var(--bg-primary); border-radius: 8px; border: 1px solid var(--border-color);">
                 <h4 style="color: var(--accent-primary); margin-bottom: 15px;">🔆 Bias Settings</h4>
+                
                 <div style="display: flex; gap: 20px; align-items: flex-start;">
+                    <!-- Left Side: Settings Grid -->
                     <div class="editor-grid" style="flex: 1;">
                         <div class="editor-field">
                             <label class="editor-label">Bias Type</label>
@@ -198,16 +217,30 @@ const ui = {
                             </select>
                         </div>
                         <div class="editor-field">
-                            <label class="editor-label">Diffuse Color</label>
-                            <input type="text" class="editor-input" value="${flare.diffuseColor}" placeholder="(400, 38, 100)"
-                                   oninput="editor.updateFlarePropertyDebounced(${index}, 'diffuseColor', this.value, 200)"
-                                   onchange="editor.updateFlareProperty(${index}, 'diffuseColor', this.value)">
+                            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+                                <label class="editor-label">Diffuse Color</label>
+                                <div style="
+                                    width: 20px;
+                                    height: 20px;
+                                    background: ${this.getColorPreview(flare, 'diffuse')};
+                                    border-radius: 3px;
+                                    border: 1px solid #555;
+                                " id="diffuse-preview-${index}"></div>
+                            </div>
+                            ${this.createAdvancedColorControls(flare, index, 'diffuse')}
                         </div>
                         <div class="editor-field">
-                            <label class="editor-label">Specular Color</label>
-                            <input type="text" class="editor-input" value="${flare.specularColor}" placeholder="(400, 38, 100)"
-                                   oninput="editor.updateFlarePropertyDebounced(${index}, 'specularColor', this.value, 200)"
-                                   onchange="editor.updateFlareProperty(${index}, 'specularColor', this.value)">
+                            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+                                <label class="editor-label">Specular Color</label>
+                                <div style="
+                                    width: 20px;
+                                    height: 20px;
+                                    background: ${this.getColorPreview(flare, 'specular')};
+                                    border-radius: 3px;
+                                    border: 1px solid #555;
+                                " id="specular-preview-${index}"></div>
+                            </div>
+                            ${this.createAdvancedColorControls(flare, index, 'specular')}
                         </div>
                         <div class="editor-field">
                             <label class="editor-label">Range</label>
@@ -240,8 +273,12 @@ const ui = {
                                    onchange="editor.updateFlareProperty(${index}, 'fadeSpan', this.value)">
                         </div>
                     </div>
+                    
+                    <!-- Right Side: Interactive Light Cone Visualization -->
                     <div class="bias-preview-container" style="flex: 1;">
-                        <h5 style="color: var(--text-secondary); margin-bottom: 10px; text-align: center;">Light Preview & Analysis</h5>
+                        <h5 style="color: var(--accent-primary); margin: 0 0 15px 0; font-size: 14px; text-align: center;">
+                            🔦 Light Cone Projection
+                        </h5>
                         ${biasPreview.createPreview(flare, index)}
                     </div>
                 </div>
@@ -259,21 +296,42 @@ const ui = {
 
     // Create pattern section for blink flares
     createPatternSection(flare, index, patternChars) {
+        const pattern = flare.blinkPattern || '1';
+        const isSimplePattern = pattern === '1' || pattern.length === 1;
+        
+        if (isSimplePattern) {
+            return `
+                <div class="pattern-section">
+                    <div class="pattern-header">
+                        <h4 style="color: var(--accent-primary); margin: 0;">⚡ Static Light (No Blink Pattern)</h4>
+                        <div class="pattern-actions">
+                            <button class="control-button" onclick="editor.enablePatternEditing(${index})">📝 Add Pattern</button>
+                        </div>
+                    </div>
+                    <div class="pattern-info">
+                        <p style="color: #999; margin: 8px 0; font-size: 13px;">
+                            🔆 This flare has no blink pattern and will remain constantly on.
+                        </p>
+                    </div>
+                </div>
+            `;
+        }
+        
         return `
             <div class="pattern-section">
                 <div class="pattern-header">
                     <h4 style="color: var(--accent-primary); margin: 0;">⚡ Blink Pattern Editor</h4>
                     <div class="pattern-actions">
-                        <button class="control-button" onclick="editor.addPatternStep(${index})">+ Add</button>
-                        <button class="control-button warning" onclick="editor.removePatternStep(${index})">- Remove</button>
-                        <button class="control-button secondary" onclick="editor.resetPattern(${index})">🔄 Clear</button>
+                        <button class="control-button" onclick="editor.addPatternStep(${index})">ADD</button>
+                        <button class="control-button warning" onclick="editor.removePatternStep(${index})">REMOVE</button>
+                        <button class="control-button primary" onclick="editor.resetPattern(${index})">CLEAR</button>
                     </div>
                 </div>
                 <div class="pattern-builder" id="pattern-builder-${index}">
                     ${patternChars}
                 </div>
                 <div class="pattern-input-row">
-                    <input type="text" class="editor-input" id="pattern-input-${index}" value="${flare.blinkPattern}" 
+                    <input type="text" class="editor-input" id="pattern-input-${index}" value="${pattern}" 
                            placeholder="Pattern: X = ON, - = OFF" onchange="editor.updatePatternFromInput(${index}, this.value)">
                 </div>
             </div>
@@ -374,6 +432,312 @@ const ui = {
         
         messageEl.textContent = message;
         modal.className = 'alert-modal show';
+    },
+
+    // Get color preview for header
+    getColorPreview(flare, colorType) {
+        const colorProperty = colorType === 'diffuse' ? 'diffuseColor' : 'specularColor';
+        const colorValue = flare[colorProperty] || '(80, 55, 100)';
+        const match = colorValue.match(/\((\d+),\s*(\d+),\s*(\d+)\)/);
+        
+        if (match) {
+            const brightness = parseInt(match[1]);
+            const hue = parseInt(match[2]);
+            const saturation = parseInt(match[3]);
+            return `hsl(${hue}, ${saturation}%, 50%)`;
+        }
+        
+        return '#888';
+    },
+
+    createAdvancedColorControls(flare, index, colorType) {
+        const colorProperty = colorType === 'diffuse' ? 'diffuseColor' : 'specularColor';
+        const colorValue = flare[colorProperty] || '(80, 200, 100)';
+        const biasSetup = flare.biasSetup || 'candela_hue_saturation';
+        
+        // Parse current color values
+        const match = colorValue.match(/\((\d+),\s*(\d+),\s*(\d+)\)/);
+        const brightness = match ? parseInt(match[1]) : 80;
+        const hue = match ? parseInt(match[2]) : 200;
+        const saturation = match ? parseInt(match[3]) : 100;
+        
+        // Determine brightness range and unit based on setup type
+        let brightnessMax = 150;
+        let brightnessUnit = 'cd';
+        if (biasSetup === 'lumen_hue_saturation') {
+            brightnessMax = 150;
+            brightnessUnit = 'lm';
+        } else if (biasSetup === 'lux_hue_saturation') {
+            brightnessMax = 150;
+            brightnessUnit = 'lx';
+        }
+        
+        // Convert hue to color for preview
+        const hueColor = `hsl(${hue}, 100%, 50%)`;
+        const previewColor = `hsl(${hue}, ${saturation}%, 50%)`;
+        
+        return `
+            <div class="compact-color-controls" style="
+                display: flex;
+                flex-direction: column;
+                gap: 6px;
+                padding: 0;
+            ">
+                <!-- Brightness Slider -->
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <div style="
+                        width: 12px;
+                        height: 12px;
+                        background: linear-gradient(to right, #000, #fff);
+                        border-radius: 2px;
+                        border: 1px solid #555;
+                        flex-shrink: 0;
+                    "></div>
+                    <input type="range" 
+                           class="compact-slider"
+                           min="0" max="${brightnessMax}" value="${brightness}" step="1"
+                           style="
+                               flex: 1;
+                               height: 8px;
+                               -webkit-appearance: none;
+                               background: linear-gradient(to right, #000000, #FFFFFF);
+                               border-radius: 4px;
+                               outline: none;
+                           "
+                           oninput="ui.updateColorComponent(${index}, '${colorType}', 'brightness', this.value)"
+                           id="${colorType}-brightness-${index}">
+                    <input type="number" 
+                           class="compact-input" 
+                           min="0" max="${brightnessMax}" value="${brightness}" step="1"
+                           style="
+                               width: 45px;
+                               height: 20px;
+                               font-size: 10px;
+                               padding: 2px 4px;
+                               border: 1px solid #555;
+                               border-radius: 2px;
+                               background: rgba(0,0,0,0);
+                               color: #000;
+                               text-align: center;
+                           "
+                           onchange="ui.updateColorComponent(${index}, '${colorType}', 'brightness', this.value)"
+                           id="${colorType}-brightness-input-${index}">
+                </div>
+                
+                <!-- Hue Slider -->
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <div style="
+                        width: 12px;
+                        height: 12px;
+                        background: linear-gradient(to right, 
+                            hsl(0, 100%, 50%), 
+                            hsl(60, 100%, 50%), 
+                            hsl(120, 100%, 50%), 
+                            hsl(180, 100%, 50%), 
+                            hsl(240, 100%, 50%), 
+                            hsl(300, 100%, 50%), 
+                            hsl(360, 100%, 50%)
+                        );
+                        border-radius: 2px;
+                        border: 1px solid #555;
+                        flex-shrink: 0;
+                    "></div>
+                    <input type="range" 
+                           class="compact-slider"
+                           min="0" max="360" value="${hue}" step="1"
+                           style="
+                               flex: 1;
+                               height: 8px;
+                               -webkit-appearance: none;
+                               background: linear-gradient(to right, 
+                                   hsl(0, 100%, 50%), 
+                                   hsl(60, 100%, 50%), 
+                                   hsl(120, 100%, 50%), 
+                                   hsl(180, 100%, 50%), 
+                                   hsl(240, 100%, 50%), 
+                                   hsl(300, 100%, 50%), 
+                                   hsl(360, 100%, 50%)
+                               );
+                               border-radius: 4px;
+                               outline: none;
+                           "
+                           oninput="ui.updateColorComponent(${index}, '${colorType}', 'hue', this.value)"
+                           id="${colorType}-hue-${index}">
+                    <input type="number" 
+                           class="compact-input" 
+                           min="0" max="360" value="${hue}" step="1"
+                           style="
+                               width: 45px;
+                               height: 20px;
+                               font-size: 10px;
+                               padding: 2px 4px;
+                               border: 1px solid #555;
+                               border-radius: 2px;
+                               background: rgba(0,0,0,0);
+                               color: #000;
+                               text-align: center;
+                           "
+                           onchange="ui.updateColorComponent(${index}, '${colorType}', 'hue', this.value)"
+                           id="${colorType}-hue-input-${index}">
+                </div>
+                
+                <!-- Saturation Slider -->
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <div style="
+                        width: 12px;
+                        height: 12px;
+                        background: linear-gradient(to right, #888, ${hueColor});
+                        border-radius: 2px;
+                        border: 1px solid #555;
+                        flex-shrink: 0;
+                    " id="${colorType}-sat-icon-${index}"></div>
+                    <input type="range" 
+                           class="compact-slider"
+                           min="0" max="100" value="${saturation}" step="1"
+                           style="
+                               flex: 1;
+                               height: 8px;
+                               -webkit-appearance: none;
+                               background: linear-gradient(to right, #888, ${hueColor});
+                               border-radius: 4px;
+                               outline: none;
+                           "
+                           oninput="ui.updateColorComponent(${index}, '${colorType}', 'saturation', this.value)"
+                           id="${colorType}-saturation-${index}">
+                    <input type="number" 
+                           class="compact-input" 
+                           min="0" max="100" value="${saturation}" step="1"
+                           style="
+                               width: 45px;
+                               height: 20px;
+                               font-size: 10px;
+                               padding: 2px 4px;
+                               border: 1px solid #555;
+                               border-radius: 2px;
+                               background: rgba(0,0,0,0);
+                               color: #000;
+                               text-align: center;
+                           "
+                           onchange="ui.updateColorComponent(${index}, '${colorType}', 'saturation', this.value)"
+                           id="${colorType}-saturation-input-${index}">
+                </div>
+            </div>
+        `;
+    },
+
+    // Update individual color component from slider
+    updateColorComponent(index, colorType, component, value) {
+        const flareData = state.getFlareData();
+        const flare = flareData[index];
+        const colorProperty = colorType === 'diffuse' ? 'diffuseColor' : 'specularColor';
+        const biasSetup = flare.biasSetup || 'candela_hue_saturation';
+        
+        // Parse current color
+        const currentColor = flare[colorProperty] || '(80, 55, 100)';
+        const match = currentColor.match(/\((\d+),\s*(\d+),\s*(\d+)\)/);
+        let brightness = match ? parseInt(match[1]) : 80;
+        let hue = match ? parseInt(match[2]) : 55;
+        let saturation = match ? parseInt(match[3]) : 100;
+        
+        // Update the changed component
+        if (component === 'brightness') {
+            brightness = parseInt(value);
+        } else if (component === 'hue') {
+            hue = parseInt(value);
+        } else if (component === 'saturation') {
+            saturation = parseInt(value);
+        }
+        
+        // Create new color string
+        const newColor = `(${brightness}, ${hue}, ${saturation})`;
+        
+        // Update the flare data
+        editor.updateFlareProperty(index, colorProperty, newColor);
+        
+        // Update UI displays
+        this.updateColorDisplays(index, colorType, brightness, hue, saturation, biasSetup);
+    },
+
+    // Update color from text input
+    updateColorFromText(index, colorType, textValue) {
+        const colorProperty = colorType === 'diffuse' ? 'diffuseColor' : 'specularColor';
+        const flareData = state.getFlareData();
+        const flare = flareData[index];
+        const biasSetup = flare.biasSetup || 'candela_hue_saturation';
+        
+        // Parse the text input
+        const match = textValue.match(/\((\d+),\s*(\d+),\s*(\d+)\)/);
+        if (match) {
+            const brightness = parseInt(match[1]);
+            const hue = parseInt(match[2]);
+            const saturation = parseInt(match[3]);
+            
+            // Update sliders
+            const brightnessSlider = document.getElementById(`${colorType}-brightness-${index}`);
+            const hueSlider = document.getElementById(`${colorType}-hue-${index}`);
+            const saturationSlider = document.getElementById(`${colorType}-saturation-${index}`);
+            
+            if (brightnessSlider) brightnessSlider.value = brightness;
+            if (hueSlider) hueSlider.value = hue;
+            if (saturationSlider) saturationSlider.value = saturation;
+            
+            // Update input boxes
+            const brightnessInput = document.getElementById(`${colorType}-brightness-input-${index}`);
+            const hueInput = document.getElementById(`${colorType}-hue-input-${index}`);
+            const saturationInput = document.getElementById(`${colorType}-saturation-input-${index}`);
+            
+            if (brightnessInput) brightnessInput.value = brightness;
+            if (hueInput) hueInput.value = hue;
+            if (saturationInput) saturationInput.value = saturation;
+            
+            // Update displays
+            this.updateColorDisplays(index, colorType, brightness, hue, saturation, biasSetup);
+        }
+        
+        // Update flare data
+        editor.updateFlareProperty(index, colorProperty, textValue);
+    },
+
+    // Update all color displays (preview, values, gradients)
+    updateColorDisplays(index, colorType, brightness, hue, saturation, biasSetup) {
+        // Update input number boxes
+        const brightnessInput = document.getElementById(`${colorType}-brightness-input-${index}`);
+        const hueInput = document.getElementById(`${colorType}-hue-input-${index}`);
+        const saturationInput = document.getElementById(`${colorType}-saturation-input-${index}`);
+        
+        if (brightnessInput) brightnessInput.value = brightness;
+        if (hueInput) hueInput.value = hue;
+        if (saturationInput) saturationInput.value = saturation;
+        
+        // Update slider values juga
+        const brightnessSlider = document.getElementById(`${colorType}-brightness-${index}`);
+        const hueSlider = document.getElementById(`${colorType}-hue-${index}`);
+        const saturationSlider = document.getElementById(`${colorType}-saturation-${index}`);
+        
+        if (brightnessSlider) brightnessSlider.value = brightness;
+        if (hueSlider) hueSlider.value = hue;
+        if (saturationSlider) saturationSlider.value = saturation;
+        
+        // Update color preview di header
+        const previewColor = `hsl(${hue}, ${saturation}%, 50%)`;
+        const headerPreview = document.getElementById(`${colorType}-preview-${index}`);
+        if (headerPreview) {
+            headerPreview.style.background = previewColor;
+        }
+        
+        // Update saturation slider and icon gradient
+        const hueColor = `hsl(${hue}, 100%, 50%)`;
+        const saturationIcon = document.getElementById(`${colorType}-sat-icon-${index}`);
+        
+        if (saturationSlider) {
+            const saturationGradient = `linear-gradient(to right, #888, ${hueColor})`;
+            saturationSlider.style.background = saturationGradient;
+        }
+        
+        if (saturationIcon) {
+            const saturationGradient = `linear-gradient(to right, #888, ${hueColor})`;
+            saturationIcon.style.background = saturationGradient;
+        }
     }
 };
 

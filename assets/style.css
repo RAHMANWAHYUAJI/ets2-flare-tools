@@ -785,3 +785,204 @@ input:checked + .toggle-slider:before {
 [data-theme="dark"] input:checked + .toggle-slider {
     background-color: #4a9eff;
 }
+
+/* Drag and Drop Animations */
+@keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.9); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes fadeOut {
+    from { opacity: 1; transform: scale(1); }
+    to { opacity: 0; transform: scale(0.9); }
+}
+
+/* Drag hover effects */
+body.drag-over {
+    background: linear-gradient(135deg, rgba(76, 175, 80, 0.1), rgba(76, 175, 80, 0.05));
+}
+
+/* File input enhancement for drag feedback */
+.file-section {
+    transition: all 0.3s ease;
+}
+
+.file-section:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Enhanced file input styling */
+.file-input-button {
+    position: relative;
+    overflow: hidden;
+}
+
+.file-input-button::after {
+    content: "📁 Pilih File atau Drag & Drop";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: inherit;
+    transition: all 0.3s ease;
+}
+
+.file-input-button:hover::after {
+    content: "🎯 Drop .sii file here!";
+    background: linear-gradient(135deg, var(--accent-primary), rgba(88, 166, 255, 0.8));
+    color: white;
+}
+
+/* Compact Color Slider Styles */
+.compact-slider {
+    -webkit-appearance: none;
+    appearance: none;
+    cursor: pointer;
+    border: 1px solid #555;
+    transition: all 0.2s ease;
+}
+
+.compact-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #fff;
+    border: 1px solid #333;
+    cursor: pointer;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.3);
+    transition: all 0.2s ease;
+}
+
+.compact-slider::-webkit-slider-thumb:hover {
+    transform: scale(1.1);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.4);
+}
+
+.compact-slider::-moz-range-thumb {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #fff;
+    border: 1px solid #333;
+    cursor: pointer;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.3);
+    transition: all 0.2s ease;
+}
+
+.compact-color-controls {
+    animation: slideInCompact 0.3s ease;
+}
+
+@keyframes slideInCompact {
+    from {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Advanced Color Slider Styles */
+.color-slider {
+    -webkit-appearance: none;
+    appearance: none;
+    cursor: pointer;
+    border: 1px solid #444;
+    transition: all 0.2s ease;
+}
+
+.color-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #fff;
+    border: 2px solid #333;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    transition: all 0.2s ease;
+}
+
+.color-slider::-webkit-slider-thumb:hover {
+    transform: scale(1.1);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.4);
+}
+
+.color-slider::-webkit-slider-thumb:active {
+    transform: scale(0.95);
+}
+
+.color-slider::-moz-range-thumb {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #fff;
+    border: 2px solid #333;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    transition: all 0.2s ease;
+}
+
+.color-slider::-moz-range-thumb:hover {
+    transform: scale(1.1);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.4);
+}
+
+.brightness-slider::-webkit-slider-thumb {
+    background: #666;
+    border: 2px solid #fff;
+}
+
+.hue-slider::-webkit-slider-thumb {
+    background: #fff;
+    border: 2px solid #333;
+}
+
+.saturation-slider::-webkit-slider-thumb {
+    background: #fff;
+    border: 2px solid #333;
+}
+
+.advanced-color-controls {
+    animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.slider-group {
+    transition: all 0.2s ease;
+}
+
+.slider-group:hover {
+    transform: translateY(-1px);
+}
+
+/* Color preview animation */
+.advanced-color-controls div[id*="preview"] {
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.advanced-color-controls div[id*="preview"]:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+}

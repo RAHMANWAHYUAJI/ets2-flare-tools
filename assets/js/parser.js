@@ -87,7 +87,10 @@ const parser = {
             name: flareName,
             type: flareType,
             lightType: this.extractProperty(flareBlock, 'light_type') || 'beacon',
+            model: this.extractProperty(flareBlock, 'model').replace(/"/g, '') || '',
             modelLightSource: this.extractProperty(flareBlock, 'model_light_source').replace(/"/g, '') || '',
+            defaultScale: this.extractProperty(flareBlock, 'default_scale') || '',
+            scaleFactor: this.extractProperty(flareBlock, 'scale_factor') || '',
             dirType: this.extractProperty(flareBlock, 'dir_type') || 'wide',
             hasBias: false
         };
@@ -195,11 +198,18 @@ const parser = {
         const blinkStepLength = parseFloat(this.extractProperty(flareBlock, 'blink_step_length')) || 0.1;
         const stateChangeDuration = parseFloat(this.extractProperty(flareBlock, 'state_change_duration')) || 0.001;
         
+        // Set default values untuk flare tanpa blink pattern
         if (blinkPattern) {
             flare.blinkPattern = blinkPattern.replace(/['"]/g, '');
             flare.blinkStepLength = blinkStepLength;
             flare.stateChangeDuration = stateChangeDuration;
             flare.isStatic = false;
+        } else {
+            // Default pattern untuk flare tanpa blink pattern (always on)
+            flare.blinkPattern = '1';
+            flare.blinkStepLength = blinkStepLength;
+            flare.stateChangeDuration = stateChangeDuration;
+            flare.isStatic = true; // Mark as static since no pattern
         }
     },
 

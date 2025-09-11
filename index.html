@@ -150,6 +150,43 @@
             margin: 20px 0;
         }
 
+        .visitor-stats {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .stat-item {
+            display: inline-block;
+            margin: 0 15px;
+            padding: 10px 15px;
+            background: rgba(255, 215, 0, 0.1);
+            border-radius: 8px;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+        }
+
+        .stat-number {
+            display: block;
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #FFD700;
+        }
+
+        .stat-label {
+            display: block;
+            font-size: 0.9em;
+            opacity: 0.8;
+            margin-top: 5px;
+        }
+
+        .github-badge {
+            margin: 10px 5px;
+            display: inline-block;
+        }
+
         @media (max-width: 768px) {
             .maintenance-container {
                 padding: 40px 20px;
@@ -161,6 +198,11 @@
             
             .maintenance-icon {
                 font-size: 80px;
+            }
+
+            .stat-item {
+                display: block;
+                margin: 10px 0;
             }
         }
     </style>
@@ -196,6 +238,30 @@
             📅 Estimasi Selesai: Segera
         </div>
 
+        <!-- Visitor Statistics -->
+        <div class="visitor-stats">
+            <h4 style="color: #FFD700; margin-bottom: 15px;">📊 Project Statistics</h4>
+            <div class="stat-item">
+                <span class="stat-number" id="visitor-count">Loading...</span>
+                <span class="stat-label">Total Visitors</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number" id="github-stars">-</span>
+                <span class="stat-label">GitHub Stars</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number" id="github-forks">-</span>
+                <span class="stat-label">GitHub Forks</span>
+            </div>
+        </div>
+
+        <!-- GitHub Badges -->
+        <div style="text-align: center; margin: 20px 0;">
+            <img src="https://img.shields.io/github/stars/RAHMANWAHYUAJI/ets2-flare-tools?style=social" alt="GitHub Stars" class="github-badge">
+            <img src="https://img.shields.io/github/forks/RAHMANWAHYUAJI/ets2-flare-tools?style=social" alt="GitHub Forks" class="github-badge">
+            <img src="https://img.shields.io/github/watchers/RAHMANWAHYUAJI/ets2-flare-tools?style=social" alt="GitHub Watchers" class="github-badge">
+        </div>
+
         <p style="margin: 20px 0; opacity: 0.8;">
             Terima kasih atas kesabaran Anda. Tool ini akan kembali online setelah pemeliharaan selesai.
         </p>
@@ -219,7 +285,83 @@
                 container.style.opacity = '1';
                 container.style.transform = 'translateY(0)';
             }, 100);
+
+            // Initialize visitor tracking and GitHub stats
+            initializeStats();
         });
+
+        // Initialize statistics
+        function initializeStats() {
+            // Load visitor count from multiple sources
+            loadVisitorCount();
+            loadGitHubStats();
+        }
+
+        // Load visitor count using multiple counter services
+        function loadVisitorCount() {
+            // Method 1: hits.sh counter (simple and reliable)
+            fetch('https://hits.sh/rahmanwahyuaji.github.io/ets2-flare-tools.json')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('visitor-count').textContent = formatNumber(data.count);
+                })
+                .catch(() => {
+                    // Method 2: Alternative counter using GitHub API views (if available)
+                    fetch('https://api.github.com/repos/RAHMANWAHYUAJI/ets2-flare-tools/traffic/views')
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.count) {
+                                document.getElementById('visitor-count').textContent = formatNumber(data.count);
+                            } else {
+                                // Fallback: Use localStorage for basic counting
+                                useLocalStorageCounter();
+                            }
+                        })
+                        .catch(() => useLocalStorageCounter());
+                });
+        }
+
+        // Load GitHub repository statistics
+        function loadGitHubStats() {
+            fetch('https://api.github.com/repos/RAHMANWAHYUAJI/ets2-flare-tools')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('github-stars').textContent = formatNumber(data.stargazers_count || 0);
+                    document.getElementById('github-forks').textContent = formatNumber(data.forks_count || 0);
+                })
+                .catch(() => {
+                    document.getElementById('github-stars').textContent = '0';
+                    document.getElementById('github-forks').textContent = '0';
+                });
+        }
+
+        // Fallback local storage counter
+        function useLocalStorageCounter() {
+            const storageKey = 'ets2-flare-tools-visits';
+            let visits = localStorage.getItem(storageKey) || 0;
+            visits = parseInt(visits) + 1;
+            localStorage.setItem(storageKey, visits);
+            document.getElementById('visitor-count').textContent = formatNumber(visits);
+        }
+
+        // Format numbers with commas
+        function formatNumber(num) {
+            return parseInt(num).toLocaleString();
+        }
+
+        // Track visitor (send analytics)
+        function trackVisitor() {
+            // Simple tracking - increment counter
+            fetch('https://hits.sh/rahmanwahyuaji.github.io/ets2-flare-tools', {
+                method: 'GET',
+                mode: 'no-cors'
+            }).catch(() => {
+                // Silent fail if service unavailable
+            });
+        }
+
+        // Call tracking when page loads
+        setTimeout(trackVisitor, 1000);
     </script>
 </body>
 </html>
