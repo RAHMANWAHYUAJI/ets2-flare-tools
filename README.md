@@ -1,5 +1,4 @@
 # Alat Flare ETS2
-# Alat Flare ETS2
 
 Editor berbasis web untuk file flare Euro Truck Simulator 2 (`.sii`).
 
