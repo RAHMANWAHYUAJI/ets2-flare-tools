@@ -39,16 +39,22 @@
                 <h1>🚨 ETS2 Flare Editor & Preview</h1>
                 <p>Editor flare dengan preview langsung</p>
                 <small style="opacity: 0.7;">💡 Tip: Gunakan Chrome/Edge terbaru untuk fitur Save As yang optimal</small>
+<<<<<<< HEAD
                 
 
 
+=======
+>>>>>>> 882e45e (Deploy: update site files and translated README)
             </div>
             <button class="theme-toggle">
                 🌙 Dark Theme
             </button>
         </div>
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 882e45e (Deploy: update site files and translated README)
         <div class="upload-section">
             <div class="file-controls">
                 <div class="file-input-wrapper">
@@ -106,6 +112,7 @@
                     <button class="control-button warning" type="button" onclick="closeAddFlareModal()">Cancel</button>
                 </div>
             </div>
+<<<<<<< HEAD
         </div>
 
         <!-- Custom Alert Modal -->
@@ -138,6 +145,31 @@
                     <span>Dana</span>
                 </a>
             </div>
+=======
+        </div>
+
+        <!-- Custom Alert Modal -->
+        <div id="alertModal" class="alert-modal">
+            <div class="alert-content">
+                <div class="alert-header">
+                    <span id="alertIcon" class="alert-icon">⚠️</span>
+                    <span id="alertTitle" class="alert-title">Alert</span>
+                </div>
+                <div id="alertMessage" class="alert-message">
+                    Message content goes here
+                </div>
+                <div class="alert-footer">
+                    <button id="alertButton" class="alert-button" onclick="closeAlert()">OK</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>ETS2 Flare Editor v2.1 | Copyright rw_aji | 
+            <a href="https://paypal.me/rwakaroseri" target="_blank" style="color: var(--accent-primary); text-decoration: none;">💳 PayPal</a> | 
+            <a href="#" onclick="showDanaInfo(); return false;" style="color: var(--accent-primary); text-decoration: none;">💰 Dana</a>
+            </p>
+>>>>>>> 882e45e (Deploy: update site files and translated README)
         </div>
 
         <!-- Sosial Media Section -->
@@ -163,6 +195,10 @@
         </div>
     </div>
     
+<<<<<<< HEAD
+=======
+    <!-- JavaScript Modules -->
+>>>>>>> 882e45e (Deploy: update site files and translated README)
     <script src="assets/js/config.js"></script>
     <script src="assets/js/includeProcessor.js"></script>
     <script src="assets/js/state.js"></script>
@@ -177,6 +213,7 @@
     <script src="assets/js/main.js"></script>
 
     <script>
+<<<<<<< HEAD
         // Show Dana donation info using custom modal
         function showDanaInfo() {
             if (document.getElementById('danaModal')) return;
@@ -228,6 +265,20 @@
         function closeDanaModal() {
             const modal = document.getElementById('danaModal');
             if (modal) modal.remove();
+=======
+        // Show Dana donation info using analytics module
+        function showDanaInfo() {
+            if (typeof analytics !== 'undefined' && analytics.showDanaInfo) {
+                analytics.showDanaInfo();
+            } else {
+                // Fallback to ui.showAlert
+                ui.showAlert(
+                    '💰 Donasi via Dana\n\nNomor: 085155102275\na.n: Rahman Wahyu Aji\n\nTerima kasih atas dukungan Anda! 🙏',
+                    'info',
+                    'Donation Info'
+                );
+            }
+>>>>>>> 882e45e (Deploy: update site files and translated README)
         }
     </script>
 </body>

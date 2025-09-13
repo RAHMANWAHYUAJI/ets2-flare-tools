@@ -26,6 +26,13 @@ const analytics = {
                 opacity: 0.8;
             ">
                 <div class="stat-item" style="display: flex; align-items: center; gap: 5px;">
+<<<<<<< HEAD
+=======
+                    <span>👥</span>
+                    <span>Active User: <strong id="active-visitors">Loading...</strong></span>
+                </div>
+                <div class="stat-item" style="display: flex; align-items: center; gap: 5px;">
+>>>>>>> 882e45e (Deploy: update site files and translated README)
                     <span>⭐</span>
                     <span>Stars: <strong id="github-stars">-</strong></span>
                 </div>
