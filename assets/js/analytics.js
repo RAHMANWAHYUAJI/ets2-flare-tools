@@ -26,10 +26,6 @@ const analytics = {
                 opacity: 0.8;
             ">
                 <div class="stat-item" style="display: flex; align-items: center; gap: 5px;">
-                    <span>👥</span>
-                    <span>Active User: <strong id="active-visitors">Loading...</strong></span>
-                </div>
-                <div class="stat-item" style="display: flex; align-items: center; gap: 5px;">
                     <span>⭐</span>
                     <span>Stars: <strong id="github-stars">-</strong></span>
                 </div>
@@ -45,21 +41,7 @@ const analytics = {
 
     // Load all statistics
     loadStats() {
-        this.loadActiveVisitors();
         this.loadGitHubStats();
-        
-        // Update active visitors every 1 second for real-time updates
-        setInterval(() => this.loadActiveVisitors(), 1000);
-    },
-
-    // Load active visitors count
-    loadActiveVisitors() {
-        // Register this visitor as active
-        this.registerActiveVisitor();
-        
-        // Get count of active visitors (last 5 minutes)
-        const activeCount = this.getActiveVisitorsCount();
-        this.updateActiveVisitors(activeCount);
     },
 
     // Load GitHub repository statistics
@@ -171,49 +153,4 @@ const analytics = {
         
         events.push({
             event: eventName,
-            data: eventData,
-            timestamp: new Date().toISOString(),
-            url: window.location.href
-        });
-
-        // Keep only last 100 events
-        if (events.length > 100) {
-            events.splice(0, events.length - 100);
-        }
-
-        localStorage.setItem(storageKey, JSON.stringify(events));
-    },
-
-    // Get analytics data (for debugging)
-    getAnalyticsData() {
-        return {
-            visits: localStorage.getItem('ets2-flare-tools-visits'),
-            pageViews: localStorage.getItem('ets2-flare-tools-page-views'),
-            events: JSON.parse(localStorage.getItem('ets2-flare-tools-events') || '[]')
-        };
-    },
-
-    // Show donation info using the existing UI system
-    showDanaInfo() {
-        if (typeof ui !== 'undefined' && ui.showAlert) {
-            ui.showAlert(
-                '💰 Donasi via Dana\n\nNomor: 085155102275\na.n: Rahman Wahyu Aji\n\nTerima kasih atas dukungan Anda! 🙏',
-                'info',
-                'Donation Info'
-            );
-        } else {
-            // Fallback alert if ui.js not available
-            alert('💰 Donasi via Dana\n\nNomor: 085155102275\na.n: Rahman Wahyu Aji\n\nTerima kasih atas dukungan Anda! 🙏');
-        }
-    }
-};
-
-// Auto-initialize if DOM is ready
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => analytics.init());
-} else {
-    analytics.init();
-}
-
-// Export for global access
-window.analytics = analytics;
+        const storageKey = 'ets2-flare-tools-events';

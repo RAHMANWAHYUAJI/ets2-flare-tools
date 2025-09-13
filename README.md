@@ -5,11 +5,17 @@ Editor berbasis web untuk file flare Euro Truck Simulator 2 (`.sii`).
 
 ## Fitur
 
-- 🔧 Mengedit properti flare (kecerahan, warna, pola)
-- 🎨 Pratinjau bias secara waktu nyata dengan visualisasi kerucut
-- 📁 Memuat dan menyimpan file `.sii`
-- 🎯 Deteksi bias otomatis dari properti inline
-- ⚡ Antarmuka modern dan responsif
+Fitur utama:
+- 🔧 Edit properti flare (kecerahan, warna, pola, nama, tipe)
+- 🎨 Pratinjau flare & bias secara real-time
+- 📁 Load dan simpan file `.sii` langsung di browser
+- �️ Tambah flare baru dengan modal editor
+- 📝 Edit dan hapus flare secara instan
+- 💡 Deteksi bias otomatis dari properti inline
+- 👁️ Visualisasi kerucut flare dengan SVG
+- 📊 Statistik GitHub dan info donasi
+- 🌐 Link sosial media developer
+- ⚡ UI modern, responsif, dan dark mode
 
 ## Penggunaan
 
