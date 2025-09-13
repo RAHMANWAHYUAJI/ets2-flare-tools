@@ -241,49 +241,6 @@ body {
     position: relative;
 }
 
-/* Light cone visualization container */
-.light-cone-container {
-    position: relative;
-    width: 200px;
-    height: 200px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: radial-gradient(circle, rgba(0,0,0,0.1), rgba(0,0,0,0.3));
-    border-radius: 8px;
-    overflow: hidden;
-}
-
-/* Light cone visualization */
-.light-cone {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: conic-gradient(
-        from 0deg,
-        transparent 0deg,
-        rgba(255, 255, 0, 0.1) var(--inner-angle),
-        rgba(255, 255, 0, 0.3) var(--inner-angle),
-        rgba(255, 255, 0, 0.1) var(--outer-angle),
-        transparent var(--outer-angle)
-    );
-    border-radius: 50%;
-    transition: all 0.3s ease;
-    opacity: 0;
-}
-
-/* Light cone active state */
-.light-cone.active {
-    opacity: 1;
-    animation: pulse-cone 2s ease-in-out infinite;
-}
-
-@keyframes pulse-cone {
-    0%, 100% { transform: translate(-50%, -50%) scale(1); }
-    50% { transform: translate(-50%, -50%) scale(1.1); }
-}
-
 /* Range visualization */
 .range-indicator {
     position: absolute;
@@ -301,6 +258,50 @@ body {
 @keyframes pulse-range {
     0%, 100% { transform: scale(1); opacity: 0.6; }
     50% { transform: scale(1.05); opacity: 0.8; }
+}
+
+/* Bias Preview Styles */
+.interactive-cone-container {
+    background: radial-gradient(ellipse at center, #0a0a0a 0%, #1a1a1a 100%);
+    border-radius: 8px;
+    padding: 15px;
+    border: 1px solid #333;
+    min-height: 280px;
+    width: 400px;
+    position: relative;
+    justify-content: center;
+    align-items: center;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.cone-visualization-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 240px;
+    min-width: 350px; /* Minimum width, can expand unlimited */
+    width: auto; /* Allow unlimited expansion */
+    overflow-x: auto; /* Horizontal scroll if needed */
+    overflow-y: hidden;
+}
+
+.cone-svg {
+    display: block;
+    transition: all 0.3s ease;
+}
+
+.enhanced-cone-wrapper {
+    background: radial-gradient(ellipse at center, #0a0a0a 0%, #1a1a1a 100%);
+    border-radius: 8px;
+    padding: 15px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 200px;
+    width: auto; /* Allow unlimited expansion */
+    overflow-x: auto; /* Horizontal scroll if needed */
+    overflow-y: hidden;
 }
 
 .flare-light {

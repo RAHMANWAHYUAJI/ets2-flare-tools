@@ -4,12 +4,25 @@
  */
 
 const app = {
+    // Flag to track if include processor is ready
+    includeProcessorReady: false,
+    
     // Initialize application
-    init() {
+    async init() {
         console.log(`${appConfig.name} v${appConfig.version} - Loading...`);
         
         // Initialize state
         state.init();
+        
+        // Initialize include processor first
+        if (typeof includeProcessor !== 'undefined') {
+            console.log('🔄 Initializing include processor...');
+            await includeProcessor.init();
+            this.includeProcessorReady = true;
+            console.log('✅ Include processor ready');
+        } else {
+            console.warn('⚠️ Include processor not available');
+        }
         
         // Bind events
         this.bindEvents();
@@ -253,9 +266,9 @@ function saveFile() {
 }
 
 // Initialize application when DOM is loaded
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     try {
-        app.init();
+        await app.init();
     } catch (error) {
         app.handleError(error, 'Initialization');
     }

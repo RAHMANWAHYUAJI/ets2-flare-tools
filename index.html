@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ETS2 Flare Tools - Maintenance Mode</title>
+    <title>ETS2 Flare Blink Editor & Preview</title>
     
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
@@ -12,536 +12,148 @@
     <link rel="apple-touch-icon" href="favicon.svg">
     
     <!-- Meta tags for SEO and social media -->
-    <meta name="description" content="ETS2 Flare Tools - Advanced flare editor for Euro Truck Simulator 2. Currently under maintenance for feature improvements.">
-    <meta name="keywords" content="ETS2, Euro Truck Simulator 2, flare, editor, tools, modding">
+    <meta name="description" content="ETS2 Flare Tools - Advanced flare editor for Euro Truck Simulator 2 with real-time preview and comprehensive editing features.">
+    <meta name="keywords" content="ETS2, Euro Truck Simulator 2, flare, editor, tools, modding, blink pattern, vehicle flare">
     <meta name="author" content="Rahman Wahyu Aji">
     
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://rahmanwahyuaji.github.io/ets2-flare-tools/">
-    <meta property="og:title" content="ETS2 Flare Tools - Maintenance Mode">
-    <meta property="og:description" content="Advanced flare editor for Euro Truck Simulator 2. Currently under maintenance for feature improvements.">
+    <meta property="og:title" content="ETS2 Flare Tools - Advanced Flare Editor">
+    <meta property="og:description" content="Advanced flare editor for Euro Truck Simulator 2 with real-time preview and comprehensive editing features.">
     <meta property="og:image" content="https://rahmanwahyuaji.github.io/ets2-flare-tools/favicon.svg">
 
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image">
     <meta property="twitter:url" content="https://rahmanwahyuaji.github.io/ets2-flare-tools/">
-    <meta property="twitter:title" content="ETS2 Flare Tools - Maintenance Mode">
-    <meta property="twitter:description" content="Advanced flare editor for Euro Truck Simulator 2. Currently under maintenance for feature improvements.">
+    <meta property="twitter:title" content="ETS2 Flare Tools - Advanced Flare Editor">
+    <meta property="twitter:description" content="Advanced flare editor for Euro Truck Simulator 2 with real-time preview and comprehensive editing features.">
     <meta property="twitter:image" content="https://rahmanwahyuaji.github.io/ets2-flare-tools/favicon.svg">
     
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-            color: white;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-
-        .maintenance-container {
-            text-align: center;
-            max-width: 600px;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 60px 40px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        .maintenance-icon {
-            font-size: 120px;
-            margin-bottom: 30px;
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
-        }
-
-        .maintenance-title {
-            font-size: 2.5em;
-            font-weight: 700;
-            margin-bottom: 20px;
-            background: linear-gradient(45deg, #FFD700, #FFA500);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .maintenance-subtitle {
-            font-size: 1.3em;
-            margin-bottom: 30px;
-            opacity: 0.9;
-            font-weight: 300;
-        }
-
-        .maintenance-message {
-            font-size: 1.1em;
-            line-height: 1.6;
-            margin-bottom: 40px;
-            opacity: 0.8;
-        }
-
-        .maintenance-features {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 15px;
-            padding: 30px;
-            margin: 30px 0;
-            text-align: left;
-        }
-
-        .feature-list {
-            list-style: none;
-            padding: 0;
-        }
-
-        .feature-list li {
-            padding: 8px 0;
-            font-size: 1em;
-            display: flex;
-            align-items: center;
-        }
-
-        .feature-list li:before {
-            content: "⚡";
-            margin-right: 10px;
-            font-size: 1.2em;
-        }
-
-        .progress-bar {
-            width: 100%;
-            height: 8px;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 4px;
-            overflow: hidden;
-            margin: 20px 0;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #FFD700, #FFA500);
-            width: 85%;
-            border-radius: 4px;
-            animation: progress 3s ease-in-out infinite;
-        }
-
-        @keyframes progress {
-            0% { width: 75%; }
-            50% { width: 95%; }
-            100% { width: 85%; }
-        }
-
-        .contact-info {
-            margin-top: 40px;
-            padding-top: 30px;
-            border-top: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        .contact-link {
-            color: #FFD700;
-            text-decoration: none;
-            font-weight: 600;
-            padding: 10px 20px;
-            border: 2px solid #FFD700;
-            border-radius: 25px;
-            display: inline-block;
-            margin: 10px;
-            transition: all 0.3s ease;
-        }
-
-        .contact-link:hover {
-            background: #FFD700;
-            color: #1e3c72;
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(255, 215, 0, 0.3);
-        }
-
-        .donation-section {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 15px;
-            padding: 25px;
-            margin: 25px 0;
-            text-align: center;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        .donation-buttons {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            flex-wrap: wrap;
-            margin-top: 15px;
-        }
-
-        .donation-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 12px 20px;
-            background: linear-gradient(45deg, #00457C, #0066CC);
-            color: white;
-            text-decoration: none;
-            border-radius: 25px;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            border: 2px solid rgba(255, 255, 255, 0.2);
-            min-width: 160px;
-            justify-content: center;
-        }
-
-        .donation-btn.dana {
-            background: linear-gradient(45deg, #118EEA, #1BA0F2);
-        }
-
-        .donation-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 15px 30px rgba(0, 69, 124, 0.4);
-        }
-
-        .donation-btn.dana:hover {
-            box-shadow: 0 15px 30px rgba(17, 142, 234, 0.4);
-        }
-
-        .eta {
-            font-size: 1.2em;
-            font-weight: 600;
-            color: #FFD700;
-            margin: 20px 0;
-        }
-
-        .visitor-stats {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            padding: 20px;
-            margin: 20px 0;
-            text-align: center;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        .stat-item {
-            display: inline-block;
-            margin: 0 15px;
-            padding: 10px 15px;
-            background: rgba(255, 215, 0, 0.1);
-            border-radius: 8px;
-            border: 1px solid rgba(255, 215, 0, 0.3);
-        }
-
-        .stat-number {
-            display: block;
-            font-size: 1.5em;
-            font-weight: bold;
-            color: #FFD700;
-        }
-
-        .stat-label {
-            display: block;
-            font-size: 0.9em;
-            opacity: 0.8;
-            margin-top: 5px;
-        }
-
-        .github-badge {
-            margin: 10px 5px;
-            display: inline-block;
-        }
-
-        @media (max-width: 768px) {
-            .maintenance-container {
-                padding: 40px 20px;
-            }
-            
-            .maintenance-title {
-                font-size: 2em;
-            }
-            
-            .maintenance-icon {
-                font-size: 80px;
-            }
-
-            .stat-item {
-                display: block;
-                margin: 10px 0;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="assets/style.css">
 </head>
-<body>
-    <div class="maintenance-container">
-        <div class="maintenance-icon">🔧</div>
-        
-        <h1 class="maintenance-title">Under Maintenance</h1>
-        <h2 class="maintenance-subtitle">Mode Pemeliharaan</h2>
-        
-        <p class="maintenance-message">
-            ETS2 Flare Tools sedang dalam tahap pengembangan dan pemeliharaan untuk memberikan pengalaman yang lebih baik.
-        </p>
-
-        <div class="maintenance-features">
-            <h3 style="color: #FFD700; margin-bottom: 20px; text-align: center;">🚀 Fitur Yang Sedang Dikembangkan</h3>
-            <ul class="feature-list">
-                <li>Enhanced Error Handling & Safe Loading</li>
-                <li>Improved Vehicle Flare Animations</li>
-                <li>Advanced Model Scale Properties</li>
-                <li>Better UI/UX with Responsive Design</li>
-                <li>Performance Optimizations</li>
-                <li>Additional Flare Types Support</li>
-            </ul>
-        </div>
-
-        <div class="progress-bar">
-            <div class="progress-fill"></div>
-        </div>
-
-        <div class="eta">
-            📅 Estimasi Selesai: Segera
-        </div>
-
-        <!-- Visitor Statistics -->
-        <div class="visitor-stats">
-            <h4 style="color: #FFD700; margin-bottom: 15px;">📊 Project Statistics</h4>
-            <div class="stat-item">
-                <span class="stat-number" id="active-visitors">Loading...</span>
-                <span class="stat-label">Active Visitors</span>
+<body data-theme="dark">
+    <div class="container">
+        <div class="header">
+            <div class="header-content">
+                <h1>🚨 ETS2 Flare Editor & Preview</h1>
+                <p>Editor flare dengan preview langsung</p>
+                <small style="opacity: 0.7;">💡 Tip: Gunakan Chrome/Edge terbaru untuk fitur Save As yang optimal</small>
             </div>
-            <div class="stat-item">
-                <span class="stat-number" id="github-stars">-</span>
-                <span class="stat-label">GitHub Stars</span>
-            </div>
-            <div class="stat-item">
-                <span class="stat-number" id="github-forks">-</span>
-                <span class="stat-label">GitHub Forks</span>
+            <button class="theme-toggle">
+                🌙 Dark Theme
+            </button>
+        </div>
+
+        <div class="upload-section">
+            <div class="file-controls">
+                <div class="file-input-wrapper">
+                    <input type="file" id="fileInput" class="file-input" accept=".sii">
+                    <button class="file-input-button">
+                        📁 Load .sii File
+                    </button>
+                </div>
+                <div class="save-buttons">
+                    <button class="control-button" onclick="showAddFlareModal()">
+                        ➕  ADD Flare
+                    </button>
+                    <button class="control-button primary" id="saveButton" disabled>
+                        💾 Simpan File
+                    </button>
+                </div>
             </div>
         </div>
 
-        <!-- GitHub Badges -->
-        <div style="text-align: center; margin: 20px 0;">
-            <img src="https://img.shields.io/github/stars/RAHMANWAHYUAJI/ets2-flare-tools?style=social" alt="GitHub Stars" class="github-badge">
-            <img src="https://img.shields.io/github/forks/RAHMANWAHYUAJI/ets2-flare-tools?style=social" alt="GitHub Forks" class="github-badge">
-            <img src="https://img.shields.io/github/watchers/RAHMANWAHYUAJI/ets2-flare-tools?style=social" alt="GitHub Watchers" class="github-badge">
+        <div id="flareSection" class="flare-section">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2 style="color: var(--accent-primary); margin: 0;">🔧 Flare Configuration</h2>
+                <div id="currentFileName" style="color: var(--text-secondary); font-size: 14px; opacity: 0.8;">
+                    <!-- File name will be displayed here -->
+                </div>
+            </div>
+            <div id="flareContainer"></div>
         </div>
 
-        <p style="margin: 20px 0; opacity: 0.8;">
-            Terima kasih atas kesabaran Anda. Tool ini akan kembali online setelah pemeliharaan selesai.
-        </p>
-
-        <div class="contact-info">
-            <p style="margin-bottom: 20px; opacity: 0.9;">Butuh bantuan atau informasi lebih lanjut?</p>
-            <a href="https://github.com/RAHMANWAHYUAJI/ets2-flare-tools" class="contact-link">📂 GitHub Repository</a>
-            <a href="https://github.com/RAHMANWAHYUAJI/ets2-flare-tools/issues" class="contact-link">🐛 Report Issues</a>
+        <!-- Add Flare Modal -->
+        <div id="addFlareModal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Add New Flare</h3>
+                    <button class="modal-close" onclick="closeAddFlareModal()">✕</button>
+                </div>
+                <div class="modal-body">
+                    <div class="editor-grid">
+                        <div class="editor-field">
+                            <label class="editor-label">Flare Type</label>
+                            <select id="newFlareType" class="editor-select">
+                                <option value="flare_blink">flare_blink (Blinking Pattern)</option>
+                                <option value="flare_vehicle">flare_vehicle (Static Vehicle)</option>
+                            </select>
+                        </div>
+                        <div class="editor-field">
+                            <label class="editor-label">Flare Name</label>
+                            <input type="text" id="newFlareName" class="editor-input" placeholder="e.g., flare.vehicle.front.left">
+                        </div>
+                    </div>
+                    <p class="modal-note">✨ Other properties can be edited after the flare is created</p>
+                </div>
+                <div class="modal-footer">
+                    <button class="control-button" type="button" onclick="event.preventDefault(); editor.createNewFlare();">Create Flare</button>
+                    <button class="control-button warning" type="button" onclick="closeAddFlareModal()">Cancel</button>
+                </div>
+            </div>
         </div>
 
-        <!-- Donation Section -->
-        <div class="donation-section">
-            <h4 style="color: #FFD700; margin-bottom: 10px;">☕ Support Development</h4>
-            <p style="opacity: 0.9; margin-bottom: 15px; font-size: 14px;">
-                Jika tools ini membantu Anda, pertimbangkan untuk mendukung pengembangan lebih lanjut
+        <!-- Custom Alert Modal -->
+        <div id="alertModal" class="alert-modal">
+            <div class="alert-content">
+                <div class="alert-header">
+                    <span id="alertIcon" class="alert-icon">⚠️</span>
+                    <span id="alertTitle" class="alert-title">Alert</span>
+                </div>
+                <div id="alertMessage" class="alert-message">
+                    Message content goes here
+                </div>
+                <div class="alert-footer">
+                    <button id="alertButton" class="alert-button" onclick="closeAlert()">OK</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>ETS2 Flare Editor v2.1 | Copyright rw_aji | 
+            <a href="https://paypal.me/rwakaroseri" target="_blank" style="color: var(--accent-primary); text-decoration: none;">💳 PayPal</a> | 
+            <a href="#" onclick="showDanaInfo(); return false;" style="color: var(--accent-primary); text-decoration: none;">💰 Dana</a>
             </p>
-            <div class="donation-buttons">
-                <a href="https://paypal.me/rwakaroseri" target="_blank" class="donation-btn">
-                    <span>💳</span>
-                    <span>PayPal</span>
-                </a>
-                <a href="#" onclick="showDanaInfo(); return false;" class="donation-btn dana">
-                    <span>💰</span>
-                    <span>Dana</span>
-                </a>
-            </div>
         </div>
     </div>
+    
+    <!-- JavaScript Modules -->
+    <script src="assets/js/config.js"></script>
+    <script src="assets/js/includeProcessor.js"></script>
+    <script src="assets/js/state.js"></script>
+    <script src="assets/js/parser.js"></script>
+    <script src="assets/js/generator.js"></script>
+    <script src="assets/js/animation.js"></script>
+    <script src="assets/js/biasPreview.js"></script>
+    <script src="assets/js/ui.js"></script>
+    <script src="assets/js/editor.js"></script>
+    <script src="assets/js/fileManager.js"></script>
+    <script src="assets/js/analytics.js"></script>
+    <script src="assets/js/main.js"></script>
 
     <script>
-        // Add some subtle animations
-        document.addEventListener('DOMContentLoaded', function() {
-            const container = document.querySelector('.maintenance-container');
-            container.style.opacity = '0';
-            container.style.transform = 'translateY(20px)';
-            
-            setTimeout(() => {
-                container.style.transition = 'all 0.8s ease';
-                container.style.opacity = '1';
-                container.style.transform = 'translateY(0)';
-            }, 100);
-
-            // Initialize visitor tracking and GitHub stats
-            initializeStats();
-        });
-
-        // Initialize statistics
-        function initializeStats() {
-            // Load active visitors and GitHub stats
-            loadActiveVisitors();
-            loadGitHubStats();
-            
-            // Update active visitors every 1 second for real-time feel
-            setInterval(loadActiveVisitors, 1000);
-        }
-
-        // Load active visitors count
-        function loadActiveVisitors() {
-            // Register this visitor as active
-            registerActiveVisitor();
-            
-            // Get count of active visitors (last 5 minutes)
-            const activeCount = getActiveVisitorsCount();
-            document.getElementById('active-visitors').textContent = formatNumber(activeCount);
-        }
-
-        // Load GitHub repository statistics
-        function loadGitHubStats() {
-            fetch('https://api.github.com/repos/RAHMANWAHYUAJI/ets2-flare-tools')
-                .then(response => response.json())
-                .then(data => {
-                    document.getElementById('github-stars').textContent = formatNumber(data.stargazers_count || 0);
-                    document.getElementById('github-forks').textContent = formatNumber(data.forks_count || 0);
-                })
-                .catch(() => {
-                    document.getElementById('github-stars').textContent = '0';
-                    document.getElementById('github-forks').textContent = '0';
-                });
-        }
-
-        // Register this visitor as active
-        function registerActiveVisitor() {
-            const storageKey = 'ets2-active-visitors';
-            const sessionId = getSessionId();
-            const now = Date.now();
-            
-            // Get current active visitors list
-            let activeVisitors = JSON.parse(localStorage.getItem(storageKey) || '{}');
-            
-            // Clean up old visitors (older than 5 minutes)
-            const fiveMinutesAgo = now - (5 * 60 * 1000);
-            Object.keys(activeVisitors).forEach(id => {
-                if (activeVisitors[id] < fiveMinutesAgo) {
-                    delete activeVisitors[id];
-                }
-            });
-            
-            // Register current visitor
-            activeVisitors[sessionId] = now;
-            
-            // Save back to localStorage
-            localStorage.setItem(storageKey, JSON.stringify(activeVisitors));
-        }
-
-        // Get count of active visitors
-        function getActiveVisitorsCount() {
-            const storageKey = 'ets2-active-visitors';
-            const activeVisitors = JSON.parse(localStorage.getItem(storageKey) || '{}');
-            const now = Date.now();
-            const fiveMinutesAgo = now - (5 * 60 * 1000);
-            
-            // Count visitors active in last 5 minutes
-            let count = 0;
-            Object.values(activeVisitors).forEach(timestamp => {
-                if (timestamp > fiveMinutesAgo) {
-                    count++;
-                }
-            });
-            
-            return Math.max(count, 1); // Always show at least 1 (current user)
-        }
-
-        // Get or create session ID
-        function getSessionId() {
-            const sessionKey = 'ets2-session-id';
-            let sessionId = sessionStorage.getItem(sessionKey);
-            
-            if (!sessionId) {
-                sessionId = 'visitor_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-                sessionStorage.setItem(sessionKey, sessionId);
-            }
-            
-            return sessionId;
-        }
-
-        // Format numbers with commas
-        function formatNumber(num) {
-            return parseInt(num).toLocaleString();
-        }
-
-        // Track visitor (send analytics)
-        function trackVisitor() {
-            // Simple tracking - increment counter
-            fetch('https://hits.sh/rahmanwahyuaji.github.io/ets2-flare-tools', {
-                method: 'GET',
-                mode: 'no-cors'
-            }).catch(() => {
-                // Silent fail if service unavailable
-            });
-        }
-
-        // Call tracking when page loads
-        setTimeout(trackVisitor, 1000);
-
-        // Show Dana donation info using custom alert
+        // Show Dana donation info using analytics module
         function showDanaInfo() {
-            // Create a simple alert modal since we don't have ui.js here
-            const alertHtml = `
-                <div id="danaModal" style="
-                    position: fixed;
-                    top: 0;
-                    left: 0;
-                    width: 100%;
-                    height: 100%;
-                    background: rgba(0, 0, 0, 0.8);
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    z-index: 9999;
-                ">
-                    <div style="
-                        background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-                        border-radius: 15px;
-                        padding: 30px;
-                        max-width: 400px;
-                        width: 90%;
-                        text-align: center;
-                        border: 2px solid rgba(255, 215, 0, 0.3);
-                        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
-                    ">
-                        <div style="font-size: 48px; margin-bottom: 15px;">💰</div>
-                        <h3 style="color: #FFD700; margin-bottom: 15px;">Donasi via Dana</h3>
-                        <div style="background: rgba(255, 255, 255, 0.1); padding: 15px; border-radius: 10px; margin: 15px 0;">
-                            <p style="font-size: 18px; font-weight: bold; color: #FFD700; margin-bottom: 5px;">085155102275</p>
-                            <p style="opacity: 0.8;">a.n: Rahman Wahyu Aji</p>
-                        </div>
-                        <p style="opacity: 0.9; margin-bottom: 20px;">Terima kasih atas dukungan Anda! 🙏</p>
-                        <button onclick="closeDanaModal()" style="
-                            background: #FFD700;
-                            color: #1e3c72;
-                            border: none;
-                            padding: 10px 25px;
-                            border-radius: 25px;
-                            font-weight: bold;
-                            cursor: pointer;
-                            transition: all 0.3s ease;
-                        ">OK</button>
-                    </div>
-                </div>
-            `;
-            
-            document.body.insertAdjacentHTML('beforeend', alertHtml);
-        }
-
-        function closeDanaModal() {
-            const modal = document.getElementById('danaModal');
-            if (modal) {
-                modal.remove();
+            if (typeof analytics !== 'undefined' && analytics.showDanaInfo) {
+                analytics.showDanaInfo();
+            } else {
+                // Fallback to ui.showAlert
+                ui.showAlert(
+                    '💰 Donasi via Dana\n\nNomor: 085155102275\na.n: Rahman Wahyu Aji\n\nTerima kasih atas dukungan Anda! 🙏',
+                    'info',
+                    'Donation Info'
+                );
             }
         }
     </script>

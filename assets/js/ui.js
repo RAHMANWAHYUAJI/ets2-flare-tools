@@ -9,6 +9,18 @@ const ui = {
         const container = document.getElementById('flareContainer');
         container.innerHTML = '';
         
+        // Add include information if available
+        const includeInfo = state.getIncludeInfo();
+        console.log('🎨 UI: Displaying flares, include info:', includeInfo);
+        
+        if (includeInfo && includeInfo.length > 0) {
+            console.log('🎨 UI: Creating include section...');
+            const includeSection = document.createElement('div');
+            includeSection.innerHTML = this.createIncludeInfo(includeInfo);
+            container.appendChild(includeSection);
+            console.log('🎨 UI: Include section added to container');
+        }
+        
         // Stop all existing animations
         animation.stopAllAnimations();
         
@@ -113,6 +125,69 @@ const ui = {
                     ${this.createEditorGrid(flare, index, lightTypeOptions, dirTypeOptions, false)}
                     ${this.createBiasToggleSection(flare, index)}
                     ${flare.hasBias ? this.createBiasSection(flare, index) : ''}
+                </div>
+            </div>
+        `;
+    },
+
+    // Create include information display
+    createIncludeInfo(includeData) {
+        if (!includeData || includeData.length === 0) {
+            return '';
+        }
+
+        const includeList = includeData.map(include => {
+            const isFound = include.properties && include.properties.length > 0;
+            const statusText = isFound ? `${include.properties.length} properties` : 'not found';
+            const statusColor = isFound ? 'var(--accent-primary)' : '#ff6b6b';
+            const icon = isFound ? '✅' : '❌';
+            
+            return `
+            <div class="include-item" style="
+                display: flex; 
+                align-items: center; 
+                gap: 8px; 
+                padding: 6px 10px; 
+                background: var(--bg-secondary); 
+                border-radius: 4px; 
+                margin: 2px 0;
+                border-left: 3px solid ${isFound ? 'var(--accent-primary)' : '#ff6b6b'};
+            ">
+                <span style="font-size: 12px;">${icon}</span>
+                <span style="font-size: 12px; color: var(--text-primary); font-family: 'Courier New', monospace; flex: 1;">
+                    ${include.path}
+                </span>
+                <span style="font-size: 11px; color: ${statusColor}; font-weight: bold;">
+                    ${statusText}
+                </span>
+            </div>
+        `;
+        }).join('');
+
+        const foundCount = includeData.filter(inc => inc.properties && inc.properties.length > 0).length;
+        const totalCount = includeData.length;
+        const headerColor = foundCount === totalCount ? 'var(--accent-primary)' : (foundCount > 0 ? '#ffa500' : '#ff6b6b');
+
+        return `
+            <div class="include-section" style="
+                margin: 10px 0;
+                padding: 12px;
+                background: rgba(255, 200, 0, 0.1);
+                border: 1px solid rgba(255, 200, 0, 0.3);
+                border-radius: 6px;
+            ">
+                <h4 style="
+                    color: ${headerColor};
+                    margin: 0 0 8px 0;
+                    font-size: 13px;
+                    display: flex;
+                    align-items: center;
+                    gap: 6px;
+                ">
+                    📂 Included SUI Files (${foundCount}/${totalCount} found)
+                </h4>
+                <div class="include-list">
+                    ${includeList}
                 </div>
             </div>
         `;
@@ -275,7 +350,7 @@ const ui = {
                     </div>
                     
                     <!-- Right Side: Interactive Light Cone Visualization -->
-                    <div class="bias-preview-container" style="flex: 1;">
+                    <div class="bias-preview-container" style="flex: 0;">
                         <h5 style="color: var(--accent-primary); margin: 0 0 15px 0; font-size: 14px; text-align: center;">
                             🔦 Light Cone Projection
                         </h5>
@@ -444,10 +519,14 @@ const ui = {
             const brightness = parseInt(match[1]);
             const hue = parseInt(match[2]);
             const saturation = parseInt(match[3]);
-            return `hsl(${hue}, ${saturation}%, 50%)`;
+            const biasSetup = flare.biasSetup || 'candela_hue_saturation';
+            
+            // Gunakan algoritma yang sama dengan biasPreview untuk konsistensi
+            const colorData = biasPreview.hslToRgb(hue, saturation, brightness, biasSetup);
+            return `rgb(${colorData.r}, ${colorData.g}, ${colorData.b})`;
         }
         
-        return '#888';
+        return 'hsl(55, 100%, 50%)';
     },
 
     createAdvancedColorControls(flare, index, colorType) {
@@ -463,6 +542,9 @@ const ui = {
         
         // Determine brightness range and unit based on setup type
         let brightnessMax = 150;
+        // Blender-style HSV: Both slider and input limited to 100
+        let sliderMax = 100;      // Slider max (same as Blender)
+        let inputMax = 100;       // Manual input max (pure Blender range)
         let brightnessUnit = 'cd';
         if (biasSetup === 'lumen_hue_saturation') {
             brightnessMax = 150;
@@ -495,7 +577,7 @@ const ui = {
                     "></div>
                     <input type="range" 
                            class="compact-slider"
-                           min="0" max="${brightnessMax}" value="${brightness}" step="1"
+                           min="0" max="${sliderMax}" value="${Math.min(brightness, sliderMax)}" step="1"
                            style="
                                flex: 1;
                                height: 8px;
@@ -508,7 +590,7 @@ const ui = {
                            id="${colorType}-brightness-${index}">
                     <input type="number" 
                            class="compact-input" 
-                           min="0" max="${brightnessMax}" value="${brightness}" step="1"
+                           min="0" max="${inputMax}" value="${brightness}" step="1"
                            style="
                                width: 45px;
                                height: 20px;
@@ -586,7 +668,7 @@ const ui = {
                     <div style="
                         width: 12px;
                         height: 12px;
-                        background: linear-gradient(to right, #888, ${hueColor});
+                        background: linear-gradient(to right, #fff, ${hueColor});
                         border-radius: 2px;
                         border: 1px solid #555;
                         flex-shrink: 0;
@@ -598,7 +680,7 @@ const ui = {
                                flex: 1;
                                height: 8px;
                                -webkit-appearance: none;
-                               background: linear-gradient(to right, #888, ${hueColor});
+                               background: linear-gradient(to right, #fff, ${hueColor});
                                border-radius: 4px;
                                outline: none;
                            "
@@ -642,6 +724,20 @@ const ui = {
         // Update the changed component
         if (component === 'brightness') {
             brightness = parseInt(value);
+            
+            // Sync slider and input (slider max 100, input max 500)
+            const brightnessSlider = document.getElementById(`${colorType}-brightness-${index}`);
+            const brightnessInput = document.getElementById(`${colorType}-brightness-input-${index}`);
+            
+            if (brightnessSlider && brightness <= 100) {
+                brightnessSlider.value = brightness;
+            } else if (brightnessSlider) {
+                brightnessSlider.value = 100; // Cap slider at 100
+            }
+            
+            if (brightnessInput) {
+                brightnessInput.value = brightness;
+            }
         } else if (component === 'hue') {
             hue = parseInt(value);
         } else if (component === 'saturation') {
@@ -718,8 +814,9 @@ const ui = {
         if (hueSlider) hueSlider.value = hue;
         if (saturationSlider) saturationSlider.value = saturation;
         
-        // Update color preview di header
-        const previewColor = `hsl(${hue}, ${saturation}%, 50%)`;
+        // Update color preview di header dengan algoritma yang sama seperti bias preview
+        const colorData = biasPreview.hslToRgb(hue, saturation, brightness, biasSetup);
+        const previewColor = `rgb(${colorData.r}, ${colorData.g}, ${colorData.b})`;
         const headerPreview = document.getElementById(`${colorType}-preview-${index}`);
         if (headerPreview) {
             headerPreview.style.background = previewColor;
@@ -730,12 +827,12 @@ const ui = {
         const saturationIcon = document.getElementById(`${colorType}-sat-icon-${index}`);
         
         if (saturationSlider) {
-            const saturationGradient = `linear-gradient(to right, #888, ${hueColor})`;
+            const saturationGradient = `linear-gradient(to right, #fff, ${hueColor})`;
             saturationSlider.style.background = saturationGradient;
         }
         
         if (saturationIcon) {
-            const saturationGradient = `linear-gradient(to right, #888, ${hueColor})`;
+            const saturationGradient = `linear-gradient(to right, #fff, ${hueColor})`;
             saturationIcon.style.background = saturationGradient;
         }
     }

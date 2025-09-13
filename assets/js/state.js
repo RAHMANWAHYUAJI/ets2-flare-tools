@@ -10,6 +10,7 @@ let originalSiiContent = '';
 let currentFileName = '';
 let currentTheme = 'dark';
 let allAnimationsRunning = false;  // Start with OFF state
+let currentIncludeInfo = null;  // Store include information
 
 // State management functions
 const state = {
@@ -45,6 +46,20 @@ const state = {
     toggleTheme() {
         const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
         this.setTheme(newTheme);
+    },
+
+    // Include information management
+    setIncludeInfo(includeInfo) {
+        currentIncludeInfo = includeInfo;
+        console.log('📂 Include info stored:', includeInfo);
+    },
+
+    getIncludeInfo() {
+        return currentIncludeInfo;
+    },
+
+    clearIncludeInfo() {
+        currentIncludeInfo = null;
     },
 
     // Flare data management

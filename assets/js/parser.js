@@ -14,6 +14,23 @@ const parser = {
             console.log('Content length:', content.length);
             console.log('Content preview:', content.substring(0, 500));
             
+            // Process @include directives first
+            let processedContent = content;
+            let includeInfo = null;
+            
+            if (typeof includeProcessor !== 'undefined') {
+                console.log('🔄 Processing @include directives...');
+                const result = includeProcessor.processIncludes(content);
+                processedContent = result.content;
+                includeInfo = result.includes;
+                console.log('✅ Include processing complete:', includeInfo?.length || 0, 'includes');
+                
+                // Store include information in state for UI display
+                state.setIncludeInfo(includeInfo);
+            } else {
+                console.warn('⚠️ Include processor not available');
+            }
+            
             // Fixed regex patterns for format: flare_blink : name
             const patterns = [
                 // Pattern 1: flare_type : name format (your file format)
@@ -32,7 +49,7 @@ const parser = {
                 let match;
                 let flareCount = 0;
                 
-                while ((match = regex.exec(content)) !== null && flareCount < appConfig.maxFlareLimit) {
+                while ((match = regex.exec(processedContent)) !== null && flareCount < appConfig.maxFlareLimit) {
                     foundAny = true;
                     flareCount++;
                     

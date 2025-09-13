@@ -22,12 +22,12 @@ const analytics = {
                 align-items: center;
                 gap: 20px;
                 margin-top: 10px;
-                font-size: 12px;
+                font-size: 14px;
                 opacity: 0.8;
             ">
                 <div class="stat-item" style="display: flex; align-items: center; gap: 5px;">
-                    <span>�</span>
-                    <span>Active: <strong id="active-visitors">Loading...</strong></span>
+                    <span>👥</span>
+                    <span>Active User: <strong id="active-visitors">Loading...</strong></span>
                 </div>
                 <div class="stat-item" style="display: flex; align-items: center; gap: 5px;">
                     <span>⭐</span>
